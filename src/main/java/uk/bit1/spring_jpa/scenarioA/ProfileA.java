@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.scenarioA;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,24 +7,27 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Profile {
+public class ProfileA {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Getter
     private Long id;
 
-    @OneToOne(mappedBy = "profile") // think 'Customer.profile'
-    private Customer customer;
+    @OneToOne(
+            // think 'Customer.profile'
+            mappedBy = "profile" // 'mappedBy' is on the Inverse Side
+    )
+    private CustomerA customer;
 
     @Getter
     private boolean marketingOptIn = false;
 
-    Profile(boolean marketingOptIn) {
+    ProfileA(boolean marketingOptIn) {
         this.marketingOptIn = marketingOptIn;
     }
 
-    void setCustomerInternal(Customer customer) {
+    void setCustomerInternal(CustomerA customer) {
         if (customer == null) {
             throw new IllegalArgumentException("Profile must have a Customer");
         }

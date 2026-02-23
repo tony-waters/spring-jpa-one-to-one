@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_3;
+package uk.bit1.spring_jpa.scenarioB;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,36 +7,34 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomerC {
+public class CustomerB {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Customer is the Inverse side
-    // Customer is the Parent side
-    // relationship is Bidirectional
+
     @Getter
     @OneToOne(
-            mappedBy = "customer", // think 'Profile.customer'
+            mappedBy = "customer",
             cascade = CascadeType.ALL,
             orphanRemoval = true
-    )
-    private ProfileC profile;
+    ) // think 'Profile.customer'
+    private ProfileB profile;
 
     @Getter
     private String displayName;
 
-    public CustomerC(String displayName) {
+    public CustomerB(String displayName) {
         if(displayName == null || displayName.isBlank()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
         this.displayName = displayName.strip();
     }
 
-    public ProfileC createProfile(boolean marketingOptIn) {
-        this.profile = new ProfileC(marketingOptIn);
+    public ProfileB createProfile(boolean marketingOptIn) {
+        this.profile = new ProfileB(marketingOptIn);
         profile.setCustomerInternal(this);
         return profile;
     }

@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.scenarioB;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

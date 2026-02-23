@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_4;
+package uk.bit1.spring_jpa.scenarioD;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

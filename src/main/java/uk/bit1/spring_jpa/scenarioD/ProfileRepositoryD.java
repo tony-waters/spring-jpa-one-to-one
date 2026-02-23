@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_4;
+package uk.bit1.spring_jpa.scenarioD;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -5,13 +5,13 @@ How do they look?
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_2/ProfileB.java: 1171 bytes ===
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.scenarioB;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.bit1.spring_jpa.entity_1.Customer;
+import uk.bit1.spring_jpa.scenarioA.CustomerA;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,13 +55,13 @@ public class ProfileB {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_2/CustomerB.java: 1142 bytes ===
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.scenarioB;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.bit1.spring_jpa.entity_2.ProfileB;
+import uk.bit1.spring_jpa.scenarioB.ProfileB;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -103,27 +103,27 @@ public class CustomerB {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_2/CustomerRepositoryB.java: 227 bytes ===
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.scenarioB;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uk.bit1.spring_jpa.entity_2.CustomerB;
+import uk.bit1.spring_jpa.scenarioB.CustomerB;
 
 public interface CustomerRepositoryB extends JpaRepository<CustomerB, Long> {
 }
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_2/ProfileRepositoryB.java: 224 bytes ===
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.scenarioB;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uk.bit1.spring_jpa.entity_2.ProfileB;
+import uk.bit1.spring_jpa.scenarioB.ProfileB;
 
 public interface ProfileRepositoryB extends JpaRepository<ProfileB, Long> {
 }
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_3/ProfileRepositoryC.java: 179 bytes ===
-package uk.bit1.spring_jpa.entity_3;
+package uk.bit1.spring_jpa.scenarioC;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -132,7 +132,7 @@ public interface ProfileRepositoryC extends JpaRepository<ProfileC, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_3/ProfileC.java: 1099 bytes ===
-package uk.bit1.spring_jpa.entity_3;
+package uk.bit1.spring_jpa.scenarioC;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -179,7 +179,7 @@ public class ProfileC {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_3/CustomerC.java: 1097 bytes ===
-package uk.bit1.spring_jpa.entity_3;
+package uk.bit1.spring_jpa.scenarioC;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -226,7 +226,7 @@ public class CustomerC {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_3/CustomerRepositoryC.java: 181 bytes ===
-package uk.bit1.spring_jpa.entity_3;
+package uk.bit1.spring_jpa.scenarioC;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -235,7 +235,7 @@ public interface CustomerRepositoryC extends JpaRepository<CustomerC, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_1/Profile.java: 1033 bytes ===
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.scenarioA;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -280,7 +280,7 @@ public class Profile {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_1/CustomerRepository.java: 179 bytes ===
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.scenarioA;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -289,7 +289,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_1/ProfileRepository.java: 177 bytes ===
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.scenarioA;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -298,7 +298,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_1/Customer.java: 1179 bytes ===
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.scenarioA;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -365,7 +365,7 @@ public class SpringJpaApplication {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_4/ProfileD.java: 1170 bytes ===
-package uk.bit1.spring_jpa.entity_4;
+package uk.bit1.spring_jpa.scenarioD;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -413,7 +413,7 @@ public class ProfileD {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_4/CustomerD.java: 1225 bytes ===
-package uk.bit1.spring_jpa.entity_4;
+package uk.bit1.spring_jpa.scenarioD;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -463,7 +463,7 @@ public class CustomerD {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_4/CustomerRepositoryD.java: 181 bytes ===
-package uk.bit1.spring_jpa.entity_4;
+package uk.bit1.spring_jpa.scenarioD;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -472,7 +472,7 @@ public interface CustomerRepositoryD extends JpaRepository<CustomerD, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_4/ProfileRepositoryD.java: 179 bytes ===
-package uk.bit1.spring_jpa.entity_4;
+package uk.bit1.spring_jpa.scenarioD;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -481,7 +481,7 @@ public interface ProfileRepositoryD extends JpaRepository<ProfileD, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_5/ProfileE.java: 964 bytes ===
-package uk.bit1.spring_jpa.entity_5;
+package uk.bit1.spring_jpa.scenarioE;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -523,7 +523,7 @@ public class ProfileE {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_5/CustomerRepositoryE.java: 181 bytes ===
-package uk.bit1.spring_jpa.entity_5;
+package uk.bit1.spring_jpa.scenarioE;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -532,7 +532,7 @@ public interface CustomerRepositoryE extends JpaRepository<CustomerE, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_5/ProfileRepositoryE.java: 179 bytes ===
-package uk.bit1.spring_jpa.entity_5;
+package uk.bit1.spring_jpa.scenarioE;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -541,7 +541,7 @@ public interface ProfileRepositoryE extends JpaRepository<ProfileE, Long> {
 
 
 === NEXT FILENAME: /home/tw/Code/spring-jpa-one-to-one/src/main/java/uk/bit1/spring_jpa/entity_5/CustomerE.java: 1051 bytes ===
-package uk.bit1.spring_jpa.entity_5;
+package uk.bit1.spring_jpa.scenarioE;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

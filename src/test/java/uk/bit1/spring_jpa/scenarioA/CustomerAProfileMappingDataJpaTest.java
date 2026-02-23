@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.scenarioA;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,26 +7,26 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-public class CustomerProfileMappingDataJpaTest {
+public class CustomerAProfileMappingDataJpaTest {
 
     @Autowired
-    CustomerRepository customerRepository;
+    CustomerRepositoryA customerRepository;
     @Autowired
-    ProfileRepository profileRepository;
+    ProfileRepositoryA profileRepository;
 
     @Test
     void creatingProfilePersistsAndSharesPrimaryKey() {
-        Customer c = new Customer("tonyW");
+        CustomerA c = new CustomerA("tonyW");
         c.createProfile(true);
 
-        Customer saved = customerRepository.saveAndFlush(c);
+        CustomerA saved = customerRepository.saveAndFlush(c);
         Long customerId = saved.getId();
 
         assertThat(customerId).isNotNull();
 
         // Profile uses @MapsId so Profile.id == Customer.id
         assertThat(profileRepository.findById(customerId)).isPresent();
-        Profile p = profileRepository.findById(customerId).orElseThrow();
+        ProfileA p = profileRepository.findById(customerId).orElseThrow();
 
         assertThat(p.getId()).isEqualTo(customerId);
         assertThat(p.isMarketingOptIn()).isTrue();
@@ -34,10 +34,10 @@ public class CustomerProfileMappingDataJpaTest {
 
     @Test
     void removingProfileDeletesOrphanRow() {
-        Customer c = new Customer("tonyW");
+        CustomerA c = new CustomerA("tonyW");
         c.createProfile(false);
 
-        Customer saved = customerRepository.saveAndFlush(c);
+        CustomerA saved = customerRepository.saveAndFlush(c);
         Long customerId = saved.getId();
 
         assertThat(profileRepository.findById(customerId)).isPresent();
