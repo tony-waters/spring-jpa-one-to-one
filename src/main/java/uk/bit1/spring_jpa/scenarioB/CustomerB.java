@@ -16,11 +16,12 @@ public class CustomerB {
 
 
     @Getter
+    // Inverse Side
     @OneToOne(
-            mappedBy = "customer",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    ) // think 'Profile.customer'
+            mappedBy = "customer", // think 'Profile.customer'
+            cascade = CascadeType.ALL, // 'cascade' is on the Parent Side
+            orphanRemoval = true // 'orphanRemoval' is on the Parent side
+    )
     private ProfileB profile;
 
     @Getter

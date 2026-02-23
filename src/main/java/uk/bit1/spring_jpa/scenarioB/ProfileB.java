@@ -17,10 +17,11 @@ public class ProfileB {
     @OneToOne(
             cascade = CascadeType.ALL
     )
+    // Owner side is here
     @JoinColumn(
             name = "customer_id",
             unique = true
-    ) // Owner side is here
+    )
     private CustomerB customer;
 
     @Getter

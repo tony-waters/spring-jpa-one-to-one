@@ -24,7 +24,9 @@ public class CustomerA {
     )
     @JoinColumn( // '@JoinColumn / @JoinTable' is on the Owning Side
             name = "profile_id",
-            unique = true //Without unique=true you’ve actually built “many customers can point to the same profile” (the object model says one-to-one, but the DB allows many-to-one).
+            unique = true   // Without unique=true we have actually built “many customers can
+                            // point to the same profile” (the object model says one-to-one,
+                            // but the DB allows many-to-one).
     )
     private ProfileA profile;
 
