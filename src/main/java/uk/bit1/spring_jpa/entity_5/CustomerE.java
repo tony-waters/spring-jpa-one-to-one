@@ -1,42 +1,38 @@
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.entity_5;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.bit1.spring_jpa.entity_2.ProfileB;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomerB {
+public class CustomerE {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     @Getter
     private Long id;
 
-
     @Getter
-    @OneToOne(
-            mappedBy = "customer",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    ) // think 'Profile.customer'
-    private ProfileB profile;
+    @MapsId("id") // maps to primary "id"
+    @OneToOne
+    @JoinColumn(name = "id") // foreign key column in T_PRODUCT Table
+    private ProfileE profile;
 
     @Getter
     private String displayName;
 
-    public CustomerB(String displayName) {
+    public CustomerE(String displayName) {
         if(displayName == null || displayName.isBlank()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
         this.displayName = displayName.strip();
     }
 
-    public ProfileB createProfile(boolean marketingOptIn) {
-        this.profile = new ProfileB(marketingOptIn);
-        profile.setCustomerInternal(this);
+    public ProfileE createProfile(boolean marketingOptIn) {
+        this.profile = new ProfileE(marketingOptIn);
+//        profile.setCustomerInternal(this);
         return profile;
     }
 

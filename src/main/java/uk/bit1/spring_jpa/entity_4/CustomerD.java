@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.entity_1;
+package uk.bit1.spring_jpa.entity_4;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,39 +7,34 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Customer {
+public class CustomerD {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Customer is the Owning side - “FK in Customer table” (customer.profile_id)
+    // Customer is the Owning side
     // Customer is the Parent side
     // relationship is Bidirectional
     @Getter
-    @OneToOne(
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JoinColumn( // Owning side is here
-            name = "profile_id",
-            unique = true //Without unique=true you’ve actually built “many customers can point to the same profile” (the object model says one-to-one, but the DB allows many-to-one).
-    )
-    private Profile profile;
+    @MapsId("id") // maps to primary "id"
+    @OneToOne
+    @JoinColumn(name = "id") // foreign key column in T_PRODUCT Table
+    private ProfileD profile;
 
     @Getter
     private String displayName;
 
-    public Customer(String displayName) {
+    public CustomerD(String displayName) {
         if(displayName == null || displayName.isBlank()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
         this.displayName = displayName.strip();
     }
 
-    public Profile createProfile(boolean marketingOptIn) {
-        this.profile = new Profile(marketingOptIn);
+    public ProfileD createProfile(boolean marketingOptIn) {
+        this.profile = new ProfileD(marketingOptIn);
         profile.setCustomerInternal(this);
         return profile;
     }

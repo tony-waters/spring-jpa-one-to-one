@@ -1,37 +1,32 @@
-package uk.bit1.spring_jpa.entity_2;
+package uk.bit1.spring_jpa.entity_3;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.bit1.spring_jpa.entity_1.Customer;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProfileB {
+public class ProfileC {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Getter
     private Long id;
 
-    @OneToOne(
-            cascade = CascadeType.ALL
-    )
-    @JoinColumn(
-            name = "customer_id",
-            unique = true
-    ) // Owner side is here
-    private CustomerB customer;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "customer_id") //
+    private CustomerC customer;
 
     @Getter
     private boolean marketingOptIn = false;
 
-    ProfileB(boolean marketingOptIn) {
+    ProfileC(boolean marketingOptIn) {
         this.marketingOptIn = marketingOptIn;
     }
 
-    void setCustomerInternal(CustomerB customer) {
+    void setCustomerInternal(CustomerC customer) {
         if (customer == null) {
             throw new IllegalArgumentException("Profile must have a Customer");
         }
