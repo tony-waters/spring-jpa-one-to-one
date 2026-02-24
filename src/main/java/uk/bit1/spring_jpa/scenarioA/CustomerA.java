@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// Customer is the Owning side - “FK in Customer table” (customer.profile_id)
+// Customer is the Parent side
+// relationship is Bidirectional
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerA {
@@ -14,9 +18,7 @@ public class CustomerA {
     @Getter
     private Long id;
 
-    // Customer is the Owning side - “FK in Customer table” (customer.profile_id)
-    // Customer is the Parent side
-    // relationship is Bidirectional
+    // Owning side
     @Getter
     @OneToOne(
             cascade = CascadeType.ALL,  // 'cascade' is on the Parent Side
@@ -24,9 +26,7 @@ public class CustomerA {
     )
     @JoinColumn( // '@JoinColumn / @JoinTable' is on the Owning Side
             name = "profile_id",
-            unique = true   // Without unique=true we have actually built “many customers can
-                            // point to the same profile” (the object model says one-to-one,
-                            // but the DB allows many-to-one).
+            unique = true   // unique enforces true 1-1
     )
     private ProfileA profile;
 
@@ -47,7 +47,12 @@ public class CustomerA {
     }
 
     public void removeProfile() {
+        if (this.profile == null) {
+            throw new IllegalStateException("Customer has no Profile to remove");
+        }
+        ProfileA old =  this.profile;
         this.profile = null;
+        old.clearCustomerInternal();
     }
 
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class ProfileC {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+//    @GeneratedValue(strategy= GenerationType.AUTO)
     @Getter
     private Long id;
 

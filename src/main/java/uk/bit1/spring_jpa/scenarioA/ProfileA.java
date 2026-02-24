@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// Profile is the Inverse side
+// Profile is the Child side
+// relationship is bidirectional
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileA {
@@ -14,13 +18,15 @@ public class ProfileA {
     @Getter
     private Long id;
 
+    // Inverse side
     @OneToOne(
-            // think 'Customer.profile'
             mappedBy = "profile" // 'mappedBy' is on the Inverse Side
     )
+    @Getter(AccessLevel.PROTECTED)
     private CustomerA customer;
 
     @Getter
+    @Column(nullable = false)
     private boolean marketingOptIn = false;
 
     ProfileA(boolean marketingOptIn) {
