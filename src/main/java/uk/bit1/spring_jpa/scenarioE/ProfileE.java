@@ -6,34 +6,35 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "profile_e")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileE {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     @Getter
-    private Long id;
+    private Long id; // no @GeneratedValue — comes from Customer via @MapsId
+
+    @OneToOne(optional = false)
+    @MapsId
+    @JoinColumn(
+            name = "customer_id",
+            nullable = false,
+            unique = true
+    )
+    @Getter
+    private CustomerE customer;
 
     @Getter
+    @Column(nullable = false)
     private boolean marketingOptIn = false;
 
-    ProfileE(boolean marketingOptIn) {
+    public ProfileE(CustomerE customer, boolean marketingOptIn) {
+        if (customer == null) {
+            throw new IllegalArgumentException("customer must not be null");
+        }
+        this.customer = customer;
         this.marketingOptIn = marketingOptIn;
     }
-
-//    void setCustomerInternal(CustomerE customer) {
-//        if (customer == null) {
-//            throw new IllegalArgumentException("Profile must have a Customer");
-//        }
-//        if (this.customer != null && !this.customer.equals(customer)) {
-//            throw new IllegalStateException("Profile cannot be moved to another Customer");
-//        }
-//        this.customer = customer;
-//    }
-
-//    void clearCustomerInternal() {
-//        this.customer = null;
-//    }
 
 }
 

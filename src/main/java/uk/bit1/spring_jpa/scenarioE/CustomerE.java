@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "customer_e")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerE {
 
@@ -15,12 +16,7 @@ public class CustomerE {
     private Long id;
 
     @Getter
-    @MapsId("id") // maps to primary "id"
-    @OneToOne
-    @JoinColumn(name = "id") // foreign key column in T_PRODUCT Table
-    private ProfileE profile;
-
-    @Getter
+    @Column(nullable = false, length = 80)
     private String displayName;
 
     public CustomerE(String displayName) {
@@ -28,16 +24,6 @@ public class CustomerE {
             throw new IllegalArgumentException("displayName must have a value");
         }
         this.displayName = displayName.strip();
-    }
-
-    public ProfileE createProfile(boolean marketingOptIn) {
-        this.profile = new ProfileE(marketingOptIn);
-//        profile.setCustomerInternal(this);
-        return profile;
-    }
-
-    public void removeProfile() {
-        this.profile = null;
     }
 
 }
