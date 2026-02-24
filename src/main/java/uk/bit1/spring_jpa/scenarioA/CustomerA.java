@@ -40,12 +40,14 @@ public class CustomerA {
         this.displayName = displayName.strip();
     }
 
+    // Parent side - lifecycle control lives here
     public ProfileA createProfile(boolean marketingOptIn) {
         this.profile = new ProfileA(marketingOptIn);
         profile.setCustomerInternal(this);
         return profile;
     }
 
+    // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");

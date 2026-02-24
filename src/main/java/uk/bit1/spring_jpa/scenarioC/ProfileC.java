@@ -6,20 +6,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "profile_c")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileC {
 
     @Id
-//    @GeneratedValue(strategy= GenerationType.AUTO)
     @Getter
-    private Long id;
+    private Long id; // no @GeneratedValue — comes from Customer via @MapsId
 
-    @OneToOne
+    // Owning side
+    @OneToOne(optional = false)
     @MapsId
-    @JoinColumn(name = "customer_id") //
+    @JoinColumn(
+            name = "customer_id",
+            nullable = false,
+            unique = true
+    )
+    @Getter(AccessLevel.PROTECTED)
     private CustomerC customer;
 
     @Getter
+    @Column(nullable = false)
     private boolean marketingOptIn = false;
 
     ProfileC(boolean marketingOptIn) {
@@ -38,6 +45,7 @@ public class ProfileC {
 
     void clearCustomerInternal() {
         this.customer = null;
+        this.id = null; // keeps in-memory state coherent; JPA will delete via orphanRemoval anyway
     }
 
 }

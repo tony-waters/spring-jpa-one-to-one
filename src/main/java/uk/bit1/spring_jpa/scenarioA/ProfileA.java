@@ -20,7 +20,7 @@ public class ProfileA {
 
     // Inverse side
     @OneToOne(
-            mappedBy = "profile" // 'mappedBy' is on the Inverse Side
+            mappedBy = "profile" // think 'customer.profile'
     )
     @Getter(AccessLevel.PROTECTED)
     private CustomerA customer;

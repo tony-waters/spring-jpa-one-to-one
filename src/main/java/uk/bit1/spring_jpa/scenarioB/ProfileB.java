@@ -14,14 +14,14 @@ public class ProfileB {
     @Getter
     private Long id;
 
-    @OneToOne(
-            cascade = CascadeType.ALL
-    )
-    // Owner side is here
-    @JoinColumn(
+    // Owning side: FK lives in 'profile' table (customer_id)
+    @OneToOne(optional = false)
+    @JoinColumn( // Owner side is here
             name = "customer_id",
-            unique = true
+            nullable = false,
+            unique = true // enforce 1-1 relationship
     )
+    @Getter(AccessLevel.PROTECTED)
     private CustomerB customer;
 
     @Getter

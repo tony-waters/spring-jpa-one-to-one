@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// Variant 2 — FK in Profile table (Profile owns FK) — bidirectional
+//
+// Schema idea: profile_b.customer_id (UNIQUE FK) → customer_b.id
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerB {
@@ -18,13 +22,14 @@ public class CustomerB {
     @Getter
     // Inverse Side
     @OneToOne(
-            mappedBy = "customer", // think 'Profile.customer'
+            mappedBy = "customer", // think 'profile.customer'
             cascade = CascadeType.ALL, // 'cascade' is on the Parent Side
             orphanRemoval = true // 'orphanRemoval' is on the Parent side
     )
     private ProfileB profile;
 
     @Getter
+    @Column(nullable = false, length = 80)
     private String displayName;
 
     public CustomerB(String displayName) {
@@ -34,14 +39,24 @@ public class CustomerB {
         this.displayName = displayName.strip();
     }
 
+    // Parent side - lifecycle control lives here
     public ProfileB createProfile(boolean marketingOptIn) {
+        if (this.profile != null) {
+            throw new IllegalStateException("Customer already has a Profile");
+        }
         this.profile = new ProfileB(marketingOptIn);
         profile.setCustomerInternal(this);
         return profile;
     }
 
+    // Parent side - lifecycle control lives here
     public void removeProfile() {
+        if (this.profile == null) {
+            throw new IllegalStateException("Customer has no Profile to remove");
+        }
+        ProfileB old = this.profile;
         this.profile = null;
+        old.clearCustomerInternal();
     }
 
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "customer_c")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerC {
 
@@ -14,10 +15,8 @@ public class CustomerC {
     @Getter
     private Long id;
 
-    // Customer is the Inverse side
-    // Customer is the Parent side
-    // relationship is Bidirectional
-    @Getter
+    // Inverse side
+    @Getter(AccessLevel.PACKAGE)
     @OneToOne(
             mappedBy = "customer", // think 'Profile.customer'
             cascade = CascadeType.ALL,
@@ -35,14 +34,20 @@ public class CustomerC {
         this.displayName = displayName.strip();
     }
 
+    // Parent side - lifecycle control lives here
     public ProfileC createProfile(boolean marketingOptIn) {
+        if (this.profile != null) throw new IllegalStateException("Customer already has a Profile");
         this.profile = new ProfileC(marketingOptIn);
         profile.setCustomerInternal(this);
         return profile;
     }
 
+    // Parent side - lifecycle control lives here
     public void removeProfile() {
+        if (this.profile == null) throw new IllegalStateException("Customer has no Profile to remove");
+        ProfileC old = this.profile;
         this.profile = null;
+        old.clearCustomerInternal();
     }
 
 }
