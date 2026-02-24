@@ -1,5 +1,4 @@
-# @OneToOne mapping style 1: Foreign Key column with Unique constraint
-
+# Variant 3 — Shared Primary Key (@MapsId) — bidirectional
 Variant 3 — Shared Primary Key (@MapsId) — bidirectional
 
 Schema idea: profile_c.id is both PK and FK to customer_c.id
