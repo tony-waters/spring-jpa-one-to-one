@@ -15,7 +15,7 @@ public class ProfileB {
     private Long id;
 
     // Owning side: FK lives in 'profile' table (customer_id)
-    @OneToOne(optional = false)
+    @OneToOne(optional = false) // avoid the eager fetching
     @JoinColumn( // Owner side is here
             name = "customer_id",
             nullable = false,

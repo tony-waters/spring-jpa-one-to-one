@@ -14,7 +14,9 @@ public class ProfileE {
     @Getter
     private Long id; // no @GeneratedValue — comes from Customer via @MapsId
 
-    @OneToOne(optional = false)
+    @OneToOne(
+            optional = false // avoid the eager fetching
+    )
     @MapsId
     @JoinColumn(
             name = "customer_id",
@@ -36,5 +38,6 @@ public class ProfileE {
         this.marketingOptIn = marketingOptIn;
     }
 
+    // no lifecycle management for Customer
 }
 

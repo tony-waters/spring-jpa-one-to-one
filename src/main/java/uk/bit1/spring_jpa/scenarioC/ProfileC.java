@@ -15,7 +15,7 @@ public class ProfileC {
     private Long id; // no @GeneratedValue — comes from Customer via @MapsId
 
     // Owning side
-    @OneToOne(optional = false)
+    @OneToOne(optional = false) // avoid the eager fetching
     @MapsId
     @JoinColumn(
             name = "customer_id",

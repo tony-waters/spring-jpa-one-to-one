@@ -26,4 +26,6 @@ public class CustomerE {
         this.displayName = displayName.strip();
     }
 
+    // no lifecycle management for Profile
+
 }
