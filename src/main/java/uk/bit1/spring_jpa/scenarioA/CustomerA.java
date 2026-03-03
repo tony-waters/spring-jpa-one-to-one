@@ -21,12 +21,13 @@ public class CustomerA {
     // Owning side
     @Getter
     @OneToOne(
+            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,  // 'cascade' is on the Parent Side
             orphanRemoval = true        // 'orphanRemoval' is on the Parent Side
     )
     @JoinColumn( // '@JoinColumn / @JoinTable' is on the Owning Side
             name = "profile_id",
-            unique = true   // unique enforces true 1-1
+            unique = true   // 'unique' enforces 1-1 in DB
     )
     private ProfileA profile;
 

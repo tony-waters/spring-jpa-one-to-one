@@ -15,7 +15,7 @@ public class ProfileE {
     private Long id; // no @GeneratedValue — comes from Customer via @MapsId
 
     @OneToOne(
-            optional = false // avoid the eager fetching
+            optional = false // TODO: avoids the eager fetching?
     )
     @MapsId
     @JoinColumn(

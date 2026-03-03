@@ -114,7 +114,7 @@ Use this when the child truly has **no independent identity**.
 
 -   Same schema shape as Variant 1, but **simpler object model**
 -   No need to keep two sides in sync
--   Cascade and orphan removal still work
+-   Cascade and orphan removal still works
 -   You lose navigation from `Profile` back to `Customer`, by design
 
 This is often a good default if you don't need bidirectional navigation.

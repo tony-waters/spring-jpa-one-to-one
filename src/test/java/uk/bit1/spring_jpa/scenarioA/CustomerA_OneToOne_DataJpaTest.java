@@ -47,4 +47,20 @@ class CustomerA_OneToOne_DataJpaTest {
 
         assertThat(profileRepo.findById(profileId)).isNotPresent();
     }
+
+    @Test
+    void profileNotEagerlyFetched() {
+        CustomerA c = new CustomerA("Alice");
+        ProfileA p = c.createProfile(false);
+        customerRepo.saveAndFlush(c);
+        long id = c.getId();
+        c = null;
+        p = null;
+
+        assertThat(customerRepo.findById(id)).isPresent();
+//        CustomerA foundCustomer = customerRepo.findById(id).orElseThrow();
+//        assertThat(foundCustomer).isNotNull();
+
+    }
+
 }
