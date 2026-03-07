@@ -17,6 +17,7 @@ public class CustomerD {
 
     // Unidirectional - Profile does NOT know about Customer
     @OneToOne(
+            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )

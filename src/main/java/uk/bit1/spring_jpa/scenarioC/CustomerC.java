@@ -18,6 +18,7 @@ public class CustomerC {
     // Inverse side
     @Getter(AccessLevel.PACKAGE)
     @OneToOne(
+            fetch =  FetchType.LAZY, // Doesnt make a difference here
             mappedBy = "customer", // think 'Profile.customer'
             cascade = CascadeType.ALL,
             orphanRemoval = true

@@ -5,10 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// Variant 2 — FK in Profile table (Profile owns FK) — bidirectional
-//
-// Schema idea: profile_b.customer_id (UNIQUE FK) → customer_b.id
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerB {
@@ -17,7 +13,6 @@ public class CustomerB {
     @GeneratedValue(strategy=GenerationType.AUTO)
     @Getter
     private Long id;
-
 
     @Getter
     // Inverse Side

@@ -22,7 +22,7 @@ class CustomerD_ProfileLazyLoadingTest {
 
     @Test
     @Transactional
-    void profile_is_not_loaded_when_customer_is_loaded() {
+    void profileIsLoadedLazily() {
 
         // given
         CustomerD c = new CustomerD("Alice");
