@@ -1,21 +1,21 @@
-package uk.bit1.spring_jpa.scenarioC;
+package uk.bit1.spring_jpa.scenarioD;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class CustomerC_MapsId_DataJpaTest {
+class CustomerD_MapsId_DataJpaTest {
 
-    @Autowired CustomerCRepository customerRepo;
-    @Autowired ProfileCRepository profileRepo;
+    @Autowired CustomerDRepository customerRepo;
+    @Autowired ProfileDRepository profileRepo;
 
     @Test
     void profileSharesPrimaryKeyWithCustomer() {
-        CustomerC c = new CustomerC("Carol");
-        ProfileC p = c.createProfile(true);
+        CustomerD c = new CustomerD("Carol");
+        ProfileD p = c.createProfile(true);
 
         customerRepo.saveAndFlush(c);
 
@@ -25,16 +25,16 @@ class CustomerC_MapsId_DataJpaTest {
         // The point of @MapsId:
         assertThat(p.getId()).isEqualTo(c.getId());
 
-        ProfileC reloadedProfile = profileRepo.findById(c.getId()).orElseThrow();
+        ProfileD reloadedProfile = profileRepo.findById(c.getId()).orElseThrow();
         assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(c.getId());
 
-        CustomerC reloadedCustomer = customerRepo.findById(c.getId()).orElseThrow();
+        CustomerD reloadedCustomer = customerRepo.findById(c.getId()).orElseThrow();
         assertThat(reloadedCustomer.getProfile().getId()).isEqualTo(c.getId());
     }
 
     @Test
     void orphanRemovalDeletesProfileRow() {
-        CustomerC c = new CustomerC("Carol");
+        CustomerD c = new CustomerD("Carol");
         c.createProfile(false);
 
         customerRepo.saveAndFlush(c);
@@ -42,7 +42,7 @@ class CustomerC_MapsId_DataJpaTest {
 
         assertThat(profileRepo.findById(sharedId)).isPresent();
 
-        CustomerC managed = customerRepo.findById(sharedId).orElseThrow();
+        CustomerD managed = customerRepo.findById(sharedId).orElseThrow();
         managed.removeProfile();
         customerRepo.saveAndFlush(managed);
 

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
-import uk.bit1.spring_jpa.scenarioC.CustomerC;
-import uk.bit1.spring_jpa.scenarioC.CustomerCRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +20,7 @@ class CustomerD_ProfileLazyLoadingTest {
 
     @Test
     @Transactional
-    void profileIsLoadedLazily() {
+    void profile_is_not_loaded_when_customer_is_loaded() {
 
         // given
         CustomerD c = new CustomerD("Alice");

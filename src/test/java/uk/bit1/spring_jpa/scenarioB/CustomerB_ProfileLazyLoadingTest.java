@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
-import uk.bit1.spring_jpa.scenarioA.CustomerA;
-import uk.bit1.spring_jpa.scenarioA.CustomerARepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
