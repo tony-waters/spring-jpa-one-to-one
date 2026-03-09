@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.scenarioE;
+package uk.bit1.spring_jpa.scenarioF;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "profile_e")
+@Table(name = "PROFILE_P")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProfileE {
+public class ProfileF {
 
     @Id
     @Getter
@@ -24,13 +24,13 @@ public class ProfileE {
             unique = true
     )
     @Getter
-    private CustomerE customer;
+    private CustomerF customer;
 
     @Getter
     @Column(nullable = false)
     private boolean marketingOptIn = false;
 
-    public ProfileE(CustomerE customer, boolean marketingOptIn) {
+    public ProfileF(CustomerF customer, boolean marketingOptIn) {
         if (customer == null) {
             throw new IllegalArgumentException("customer must not be null");
         }
