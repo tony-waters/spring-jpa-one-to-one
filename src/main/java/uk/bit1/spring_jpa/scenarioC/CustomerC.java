@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.scenarioD;
+package uk.bit1.spring_jpa.scenarioC;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,33 +6,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "customer_d")
+@Table(name = "customer_c")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomerD {
+public class CustomerC {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Unidirectional - Profile does NOT know about Customer
+    // Inverse side
+    @Getter(AccessLevel.PACKAGE)
     @OneToOne(
-            fetch = FetchType.LAZY,
+            fetch =  FetchType.LAZY, // Doesnt make a difference here
+            mappedBy = "customer", // think 'Profile.customer'
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @JoinColumn(
-            name = "profile_id",
-            unique = true
-    )
-    @Getter // since Profile does not reference Customer no reason to not provide a public getter
-    private ProfileD profile;
+    private ProfileC profile;
 
     @Getter
-    @Column(nullable = false, length = 80)
     private String displayName;
 
-    public CustomerD(String displayName) {
+    public CustomerC(String displayName) {
         if(displayName == null || displayName.isBlank()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
@@ -40,16 +36,19 @@ public class CustomerD {
     }
 
     // Parent side - lifecycle control lives here
-    public ProfileD createProfile(boolean marketingOptIn) {
+    public ProfileC createProfile(boolean marketingOptIn) {
         if (this.profile != null) throw new IllegalStateException("Customer already has a Profile");
-        this.profile = new ProfileD(marketingOptIn);
+        this.profile = new ProfileC(marketingOptIn);
+        profile.setCustomerInternal(this);
         return profile;
     }
 
     // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) throw new IllegalStateException("Customer has no Profile to remove");
+        ProfileC old = this.profile;
         this.profile = null;
+        old.clearCustomerInternal();
     }
 
 }

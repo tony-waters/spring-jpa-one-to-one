@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.scenarioE;
+package uk.bit1.spring_jpa.scenarioC;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
@@ -6,31 +6,33 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
+import uk.bit1.spring_jpa.scenarioB.CustomerB;
+import uk.bit1.spring_jpa.scenarioB.CustomerBRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class CustomerE_ProfileLazyLoadingTest {
+class CustomerC_ProfileLazyLoadingTest {
 
     @Autowired
-    CustomerERepository customerRepository;
+    CustomerCRepository customerRepository;
 
     @Autowired
     EntityManager entityManager;
 
     @Test
     @Transactional
-    void profileIsLoadedLazily() {
+    void profile_is_not_loaded_when_customer_is_loaded() {
 
         // given
-        CustomerE c = new CustomerE("Alice");
+        CustomerC c = new CustomerC("Alice");
         c.createProfile(true);
         customerRepository.saveAndFlush(c);
 
         entityManager.clear(); // detach everything
 
         // when
-        CustomerE loaded = customerRepository.findById(c.getId()).orElseThrow();
+        CustomerC loaded = customerRepository.findById(c.getId()).orElseThrow();
 
         // then
         assertThat(Hibernate.isInitialized(loaded.getProfile()))

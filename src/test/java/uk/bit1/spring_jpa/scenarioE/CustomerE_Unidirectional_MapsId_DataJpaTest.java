@@ -1,25 +1,25 @@
-package uk.bit1.spring_jpa.scenarioF;
+package uk.bit1.spring_jpa.scenarioE;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-class CustomerF_Unidirectional_MapsId_DataJpaTest {
+class CustomerE_Unidirectional_MapsId_DataJpaTest {
 
-    @Autowired CustomerFRepository customerRepo;
-    @Autowired ProfileFRepository profileRepo;
+    @Autowired CustomerERepository customerRepo;
+    @Autowired ProfileERepository profileRepo;
 
     @Test
     void profileSharesPrimaryKeyWithCustomer_butMustBeSavedSeparately() {
-        CustomerF c = new CustomerF("Eve");
+        CustomerE c = new CustomerE("Eve");
         customerRepo.saveAndFlush(c);
 
         assertThat(c.getId()).isNotNull();
 
-        ProfileF p = new ProfileF(c, true);
+        ProfileE p = new ProfileE(c, true);
         profileRepo.saveAndFlush(p);
 
         assertThat(p.getId()).isEqualTo(c.getId());
@@ -28,10 +28,10 @@ class CustomerF_Unidirectional_MapsId_DataJpaTest {
 
     @Test
     void deletingCustomerDoesNotAutomaticallyDeleteProfile_inThisUnidirectionalModel() {
-        CustomerF c = new CustomerF("Eve");
+        CustomerE c = new CustomerE("Eve");
         customerRepo.saveAndFlush(c);
 
-        ProfileF p = new ProfileF(c, false);
+        ProfileE p = new ProfileE(c, false);
         profileRepo.saveAndFlush(p);
 
         Long id = c.getId();
