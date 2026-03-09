@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.scenario;
+package uk.bit1.spring_jpa.scenarioE;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Customer {
+public class CustomerE {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -27,7 +27,7 @@ public class Customer {
     @Column(nullable = false, length = 80)
     private String displayName;
 
-    public Customer(String displayName) {
+    public CustomerE(String displayName) {
         if(displayName == null || displayName.isBlank()) {
             throw new IllegalArgumentException("displayName must have a value");
         }

@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.scenario;
+package uk.bit1.spring_jpa.scenarioE;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Profile {
+public class ProfileE {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -24,12 +24,12 @@ public class Profile {
             unique = true // enforce 1-1 relationship
     )
     @Getter(AccessLevel.PROTECTED)
-    private Customer customer;
+    private CustomerE customerE;
 
     @Getter
     private boolean marketingOptIn = false;
 
-    Profile(boolean marketingOptIn) {
+    ProfileE(boolean marketingOptIn) {
         this.marketingOptIn = marketingOptIn;
     }
 
