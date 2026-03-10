@@ -7,7 +7,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class VariantC_DataJpaTest {
+class VariantC_BidirectionalSharedPkMapsIdTest {
 
     @Autowired CustomerCRepository customerRepository;
     @Autowired ProfileCRepository profileRepository;

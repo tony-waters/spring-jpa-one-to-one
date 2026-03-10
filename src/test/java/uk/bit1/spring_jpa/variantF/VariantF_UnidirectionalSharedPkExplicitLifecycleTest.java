@@ -3,13 +3,12 @@ package uk.bit1.spring_jpa.variantF;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
-class VariantF_DataJpaTest {
+class VariantF_UnidirectionalSharedPkExplicitLifecycleTest {
 
     @Autowired CustomerFRepository customerRepository;
     @Autowired ProfileFRepository profileRepository;

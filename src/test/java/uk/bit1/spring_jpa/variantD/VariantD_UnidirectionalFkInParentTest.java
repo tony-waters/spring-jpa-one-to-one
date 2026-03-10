@@ -7,7 +7,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class VariantD_DataJpaTest {
+class VariantD_UnidirectionalFkInParentTest {
 
     @Autowired CustomerDRepository customerRepository;
     @Autowired ProfileDRepository profileRepository;
