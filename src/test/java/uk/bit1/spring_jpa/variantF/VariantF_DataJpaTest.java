@@ -27,12 +27,19 @@ class VariantF_DataJpaTest {
     }
 
     @Test
-    void savingProfileWithoutPersistedCustomerFails() {
+    void savingProfileWithTransientCustomer_persistsBothInThisHibernateSetup() {
+        // In this setup, Hibernate chooses to persist the referenced parent automatically
+        // so it can satisfy the derived identity relationship.
+        // ... this is not guaranteed for other setups
         CustomerF transientCustomer = new CustomerF("Eve");
         ProfileF profile = new ProfileF(transientCustomer, false);
 
-        assertThatThrownBy(() -> profileRepository.saveAndFlush(profile))
-                .isInstanceOfAny(DataIntegrityViolationException.class, RuntimeException.class);
+        profileRepository.saveAndFlush(profile);
+
+        assertThat(transientCustomer.getId()).isNotNull();
+        assertThat(profile.getId()).isEqualTo(transientCustomer.getId());
+        assertThat(customerRepository.findById(transientCustomer.getId())).isPresent();
+        assertThat(profileRepository.findById(transientCustomer.getId())).isPresent();
     }
 
     @Test
