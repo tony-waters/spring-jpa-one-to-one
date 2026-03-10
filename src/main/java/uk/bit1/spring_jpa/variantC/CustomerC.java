@@ -16,7 +16,7 @@ public class CustomerC {
     private Long id;
 
     // Inverse side
-    @Getter(AccessLevel.PACKAGE)
+    @Getter(AccessLevel.PUBLIC)
     @OneToOne(
             mappedBy = "customer", // think 'Profile.customer'
             fetch =  FetchType.LAZY, // this will not always work
