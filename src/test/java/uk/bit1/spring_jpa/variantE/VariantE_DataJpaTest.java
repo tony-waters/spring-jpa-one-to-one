@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
-class ScenarioE_DataJpaTest {
+class VariantE_DataJpaTest {
 
     @Autowired
     CustomerERepository customerRepository;
