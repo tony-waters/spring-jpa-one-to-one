@@ -18,14 +18,15 @@ public class CustomerC {
     // Inverse side
     @Getter(AccessLevel.PACKAGE)
     @OneToOne(
-            fetch =  FetchType.LAZY, // this will not always work
             mappedBy = "customer", // think 'Profile.customer'
+            fetch =  FetchType.LAZY, // this will not always work
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private ProfileC profile;
 
     @Getter
+    @Column(nullable = false, length = 80)
     private String displayName;
 
     public CustomerC(String displayName) {
@@ -35,24 +36,25 @@ public class CustomerC {
         this.displayName = displayName.strip();
     }
 
-    // Parent side - lifecycle control lives here
+    // Parent side lifecycle control
     public ProfileC createProfile(boolean marketingOptIn) {
         if (this.profile != null) {
             throw new IllegalStateException("Customer already has a Profile");
         }
-        this.profile = new ProfileC(marketingOptIn);
-        profile.setCustomerInternal(this);
+        ProfileC profile = new ProfileC(marketingOptIn);
+        profile.setCustomerInternal(this); // owning side first
+        this.profile = profile;            // inverse side second
         return profile;
     }
 
-    // Parent side - lifecycle control lives here
+    // Parent side lifecycle control
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");
         }
-        ProfileC old = this.profile;
+        ProfileC oldProfile = this.profile;
         this.profile = null;
-        old.clearCustomerInternal();
+        oldProfile.clearCustomerInternal();
     }
 
 }

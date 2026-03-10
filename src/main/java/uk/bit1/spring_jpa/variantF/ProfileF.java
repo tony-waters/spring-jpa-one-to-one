@@ -38,5 +38,6 @@ public class ProfileF {
     }
 
     // no lifecycle management for Customer
+    // relationship is managed from the Service layer
 }
 
