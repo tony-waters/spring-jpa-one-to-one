@@ -44,9 +44,6 @@ public class ProfileC {
 
     void clearCustomerInternal() {
         this.customer = null;
-        // Clearing the child reference keeps the in-memory object graph coherent.
-        // The actual database row is removed by JPA because of 'orphanRemoval = true'
-        this.id = null;
     }
 
 }
