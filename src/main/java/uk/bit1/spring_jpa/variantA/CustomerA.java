@@ -43,6 +43,9 @@ public class CustomerA {
 
     // Parent side - lifecycle control lives here
     public ProfileA createProfile(boolean marketingOptIn) {
+        if (this.profile != null) {
+            throw new IllegalStateException("Customer already has a Profile");
+        }
         this.profile = new ProfileA(marketingOptIn);
         profile.setCustomerInternal(this);
         return profile;

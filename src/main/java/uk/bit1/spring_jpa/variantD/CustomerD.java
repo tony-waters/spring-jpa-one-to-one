@@ -41,14 +41,18 @@ public class CustomerD {
 
     // Parent side - lifecycle control lives here
     public ProfileD createProfile(boolean marketingOptIn) {
-        if (this.profile != null) throw new IllegalStateException("Customer already has a Profile");
+        if (this.profile != null) {
+            throw new IllegalStateException("Customer already has a Profile");
+        }
         this.profile = new ProfileD(marketingOptIn);
         return profile;
     }
 
     // Parent side - lifecycle control lives here
     public void removeProfile() {
-        if (this.profile == null) throw new IllegalStateException("Customer has no Profile to remove");
+        if (this.profile == null) {
+            throw new IllegalStateException("Customer has no Profile to remove");
+        }
         this.profile = null;
     }
 
