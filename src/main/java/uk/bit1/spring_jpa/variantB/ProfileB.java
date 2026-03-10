@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "PROFILE_B")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileB {
 
@@ -27,6 +28,7 @@ public class ProfileB {
     private CustomerB customer;
 
     @Getter
+    @Column(nullable = false)
     private boolean marketingOptIn = false;
 
     ProfileB(boolean marketingOptIn) {

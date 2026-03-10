@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 // relationship is bidirectional
 
 @Entity
+@Table(name = "PROFILE_A")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileA {
 

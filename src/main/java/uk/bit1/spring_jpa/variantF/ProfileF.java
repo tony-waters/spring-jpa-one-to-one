@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "PROFILE_P")
+@Table(name = "PROFILE_F")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileF {
 
@@ -15,13 +15,12 @@ public class ProfileF {
     private Long id; // no @GeneratedValue — comes from Customer via @MapsId
 
     @OneToOne(
-            optional = false // TODO: avoids the eager fetching?
+            optional = false // child must always reference a parent
     )
     @MapsId
     @JoinColumn(
             name = "customer_id",
-            nullable = false,
-            unique = true
+            nullable = false
     )
     @Getter
     private CustomerF customer;

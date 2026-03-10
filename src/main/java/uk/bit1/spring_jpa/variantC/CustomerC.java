@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "customer_c")
+@Table(name = "CUSTOMER_C")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerC {
 
@@ -18,7 +18,7 @@ public class CustomerC {
     // Inverse side
     @Getter(AccessLevel.PACKAGE)
     @OneToOne(
-            fetch =  FetchType.LAZY, // Doesnt make a difference here
+            fetch =  FetchType.LAZY, // this will not always work
             mappedBy = "customer", // think 'Profile.customer'
             cascade = CascadeType.ALL,
             orphanRemoval = true

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "CUSTOMER_B")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerB {
 

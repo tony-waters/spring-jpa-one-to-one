@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "profile_c")
+@Table(name = "PROFILE_C")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileC {
 
@@ -15,12 +15,11 @@ public class ProfileC {
     private Long id; // no @GeneratedValue — comes from Customer via @MapsId
 
     // Owning side
-    @OneToOne(optional = false) // TODO: avoid the eager fetching?
+    @OneToOne(optional = false) // child must always reference a parent
     @MapsId
     @JoinColumn(
             name = "customer_id",
-            nullable = false,
-            unique = true
+            nullable = false
     )
     @Getter(AccessLevel.PROTECTED)
     private CustomerC customer;
@@ -45,7 +44,9 @@ public class ProfileC {
 
     void clearCustomerInternal() {
         this.customer = null;
-        this.id = null; // keeps in-memory state coherent; JPA will delete via orphanRemoval anyway
+        // Clearing the child reference keeps the in-memory object graph coherent.
+        // The actual database row is removed by JPA because of orphanRemoval = true.
+        this.id = null;
     }
 
 }

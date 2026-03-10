@@ -5,11 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// Customer is the Owning side - “FK in Customer table” (customer.profile_id)
-// Customer is the Parent side
-// relationship is Bidirectional
-
 @Entity
+@Table(name = "CUSTOMER_A")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerA {
 
@@ -32,6 +29,7 @@ public class CustomerA {
     private ProfileA profile;
 
     @Getter
+    @Column(nullable = false, length = 80)
     private String displayName;
 
     public CustomerA(String displayName) {
