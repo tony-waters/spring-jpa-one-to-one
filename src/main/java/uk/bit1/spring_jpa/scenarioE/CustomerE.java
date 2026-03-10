@@ -26,6 +26,6 @@ public class CustomerE {
         this.displayName = displayName.strip();
     }
 
-    // no lifecycle management for Profile
-    // control is done from the service layer
+    // no lifecycle management here
+    // relationship is managed from the service layer
 }
