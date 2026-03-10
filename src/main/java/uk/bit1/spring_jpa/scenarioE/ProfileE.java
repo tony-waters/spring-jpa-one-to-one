@@ -6,49 +6,37 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "profile_e")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileE {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Owning side: FK lives in 'profile' table (customer_id)
-    @OneToOne(
-            optional = false
-    )
-    @JoinColumn( // Owner side is here
+    // Owning side: FK lives in profile_e.customer_id
+    @OneToOne(optional = false)
+    @JoinColumn(
             name = "customer_id",
             nullable = false,
-            unique = true // enforce 1-1 relationship
+            unique = true
     )
     @Getter(AccessLevel.PROTECTED)
-    private CustomerE customerE;
+    private CustomerE customer;
 
     @Getter
+    @Column(nullable = false)
     private boolean marketingOptIn = false;
 
-    ProfileE(boolean marketingOptIn) {
+    ProfileE(CustomerE customer, boolean marketingOptIn) {
+        if (customer == null) {
+            throw new IllegalArgumentException("customer must not be null");
+        }
+        this.customer = customer;
         this.marketingOptIn = marketingOptIn;
     }
 
-//    void setCustomerInternal(CustomerB customer) {
-//        if (customer == null) {
-//            throw new IllegalArgumentException("Profile must have a Customer");
-//        }
-//        if (this.customer != null && !this.customer.equals(customer)) {
-//            throw new IllegalStateException("Profile cannot be moved to another Customer");
-//        }
-//        this.customer = customer;
-//    }
-//
-//    void clearCustomerInternal() {
-//        this.customer = null;
-//    }
-
-    // no lifecycle management for Profile
-    // control is done from Service instead
-
+    // no lifecycle management here
+    // relationship is managed from the service layer
 }
-
