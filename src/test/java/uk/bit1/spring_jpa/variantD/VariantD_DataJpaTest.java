@@ -9,37 +9,54 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 class VariantD_DataJpaTest {
 
-    @Autowired CustomerDRepository customerRepo;
-    @Autowired ProfileDRepository profileRepo;
+    @Autowired CustomerDRepository customerRepository;
+    @Autowired ProfileDRepository profileRepository;
 
     @Test
-    void cascadePersistsProfile_withoutBackReference() {
-        CustomerD c = new CustomerD("Dan");
-        ProfileD p = c.createProfile(true);
+    void cascadePersist_savesCustomerAndProfile_withoutBackReference() {
+        CustomerD customer = new CustomerD("Dan");
+        ProfileD profile = customer.createProfile(true);
 
-        customerRepo.saveAndFlush(c);
+        customerRepository.saveAndFlush(customer);
 
-        assertThat(c.getId()).isNotNull();
-        assertThat(p.getId()).isNotNull();
+        assertThat(customer.getId()).isNotNull();
+        assertThat(profile.getId()).isNotNull();
 
-        CustomerD reloaded = customerRepo.findById(c.getId()).orElseThrow();
-        assertThat(reloaded.getProfile()).isNotNull();
-        assertThat(reloaded.getProfile().isMarketingOptIn()).isTrue();
+        CustomerD reloadedCustomer = customerRepository.findById(customer.getId()).orElseThrow();
+        assertThat(reloadedCustomer.getProfile()).isNotNull();
+        assertThat(reloadedCustomer.getProfile().isMarketingOptIn()).isTrue();
     }
 
     @Test
-    void orphanRemovalDeletesProfileRow() {
-        CustomerD c = new CustomerD("Dan");
-        ProfileD p = c.createProfile(false);
+    void removingProfile_triggersOrphanRemoval_andDeletesProfileRow() {
+        CustomerD customer = new CustomerD("Dan");
+        ProfileD profile = customer.createProfile(false);
 
-        customerRepo.saveAndFlush(c);
-        Long profileId = p.getId();
-        assertThat(profileRepo.findById(profileId)).isPresent();
+        customerRepository.saveAndFlush(customer);
+        Long profileId = profile.getId();
 
-        CustomerD managed = customerRepo.findById(c.getId()).orElseThrow();
+        assertThat(profileRepository.findById(profileId)).isPresent();
+
+        CustomerD managed = customerRepository.findById(customer.getId()).orElseThrow();
         managed.removeProfile();
-        customerRepo.saveAndFlush(managed);
+        customerRepository.saveAndFlush(managed);
 
-        assertThat(profileRepo.findById(profileId)).isNotPresent();
+        assertThat(profileRepository.findById(profileId)).isNotPresent();
+    }
+
+    @Test
+    void deletingCustomer_cascadesDeleteToProfile() {
+        CustomerD customer = new CustomerD("Dan");
+        ProfileD profile = customer.createProfile(true);
+
+        customerRepository.saveAndFlush(customer);
+        Long customerId = customer.getId();
+        Long profileId = profile.getId();
+
+        customerRepository.deleteById(customerId);
+        customerRepository.flush();
+
+        assertThat(customerRepository.findById(customerId)).isNotPresent();
+        assertThat(profileRepository.findById(profileId)).isNotPresent();
     }
 }

@@ -4,48 +4,61 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class VariantC_DataJpaTest {
 
-    @Autowired CustomerCRepository customerRepo;
-    @Autowired ProfileCRepository profileRepo;
+    @Autowired CustomerCRepository customerRepository;
+    @Autowired ProfileCRepository profileRepository;
 
     @Test
-    void profileSharesPrimaryKeyWithCustomer() {
-        CustomerC c = new CustomerC("Carol");
-        ProfileC p = c.createProfile(true);
+    void mapsId_profileSharesPrimaryKeyWithCustomer() {
+        CustomerC customer = new CustomerC("Carol");
+        ProfileC profile = customer.createProfile(true);
 
-        customerRepo.saveAndFlush(c);
+        customerRepository.saveAndFlush(customer);
 
-        assertThat(c.getId()).isNotNull();
-        assertThat(p.getId()).isNotNull();
+        assertThat(customer.getId()).isNotNull();
+        assertThat(profile.getId()).isEqualTo(customer.getId());
 
-        // The point of @MapsId:
-        assertThat(p.getId()).isEqualTo(c.getId());
+        ProfileC reloadedProfile = profileRepository.findById(customer.getId()).orElseThrow();
+        assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(customer.getId());
 
-        ProfileC reloadedProfile = profileRepo.findById(c.getId()).orElseThrow();
-        assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(c.getId());
-
-        CustomerC reloadedCustomer = customerRepo.findById(c.getId()).orElseThrow();
-        assertThat(reloadedCustomer.getProfile().getId()).isEqualTo(c.getId());
+        CustomerC reloadedCustomer = customerRepository.findById(customer.getId()).orElseThrow();
+        assertThat(reloadedCustomer.getProfile()).isNotNull();
+        assertThat(reloadedCustomer.getProfile().getId()).isEqualTo(customer.getId());
     }
 
     @Test
-    void orphanRemovalDeletesProfileRow() {
-        CustomerC c = new CustomerC("Carol");
-        c.createProfile(false);
+    void removingProfile_triggersOrphanRemoval_andDeletesSharedPrimaryKeyRow() {
+        CustomerC customer = new CustomerC("Carol");
+        customer.createProfile(false);
 
-        customerRepo.saveAndFlush(c);
-        Long sharedId = c.getId();
+        customerRepository.saveAndFlush(customer);
+        Long sharedId = customer.getId();
 
-        assertThat(profileRepo.findById(sharedId)).isPresent();
+        assertThat(profileRepository.findById(sharedId)).isPresent();
 
-        CustomerC managed = customerRepo.findById(sharedId).orElseThrow();
+        CustomerC managed = customerRepository.findById(sharedId).orElseThrow();
         managed.removeProfile();
-        customerRepo.saveAndFlush(managed);
+        customerRepository.saveAndFlush(managed);
 
-        assertThat(profileRepo.findById(sharedId)).isNotPresent();
+        assertThat(profileRepository.findById(sharedId)).isNotPresent();
+    }
+
+    @Test
+    void deletingCustomer_cascadesDeleteToSharedPrimaryKeyProfile() {
+        CustomerC customer = new CustomerC("Carol");
+        customer.createProfile(true);
+
+        customerRepository.saveAndFlush(customer);
+        Long sharedId = customer.getId();
+
+        customerRepository.deleteById(sharedId);
+        customerRepository.flush();
+
+        assertThat(customerRepository.findById(sharedId)).isNotPresent();
+        assertThat(profileRepository.findById(sharedId)).isNotPresent();
     }
 }

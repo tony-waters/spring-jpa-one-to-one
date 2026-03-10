@@ -3,58 +3,52 @@ package uk.bit1.spring_jpa.variantF;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 class VariantF_DataJpaTest {
 
-    @Autowired
-    CustomerFRepository customerRepo;
-    @Autowired
-    ProfileFRepository profileRepo;
+    @Autowired CustomerFRepository customerRepository;
+    @Autowired ProfileFRepository profileRepository;
 
     @Test
-    void profileSharesPrimaryKeyWithCustomer_butMustBeSavedSeparately() {
-        CustomerF c = new CustomerF("Eve");
-        customerRepo.saveAndFlush(c);
+    void mapsId_profileSharesPrimaryKeyWithCustomer_whenSavedSeparately() {
+        CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
 
-        assertThat(c.getId()).isNotNull();
+        ProfileF profile = new ProfileF(customer, true);
+        profileRepository.saveAndFlush(profile);
 
-        ProfileF p = new ProfileF(c, true);
-        profileRepo.saveAndFlush(p);
-
-        assertThat(p.getId()).isEqualTo(c.getId());
-        assertThat(profileRepo.findById(c.getId())).isPresent();
+        assertThat(customer.getId()).isNotNull();
+        assertThat(profile.getId()).isEqualTo(customer.getId());
+        assertThat(profileRepository.findById(customer.getId())).isPresent();
     }
 
     @Test
-    void deletingCustomerDoesNotAutomaticallyDeleteProfile_inThisUnidirectionalModel() {
-        CustomerF c = new CustomerF("Eve");
-        customerRepo.saveAndFlush(c);
+    void savingProfileWithoutPersistedCustomerFails() {
+        CustomerF transientCustomer = new CustomerF("Eve");
+        ProfileF profile = new ProfileF(transientCustomer, false);
 
-        ProfileF p = new ProfileF(c, false);
-        profileRepo.saveAndFlush(p);
+        assertThatThrownBy(() -> profileRepository.saveAndFlush(profile))
+                .isInstanceOfAny(DataIntegrityViolationException.class, RuntimeException.class);
+    }
 
-        Long id = c.getId();
-        assertThat(profileRepo.findById(id)).isPresent();
+    @Test
+    void explicitDeleteOfProfileThenCustomerWorksInServiceManagedModel() {
+        CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
+        ProfileF profile = profileRepository.saveAndFlush(new ProfileF(customer, false));
 
-        // Depending on DB + JPA DDL, this may fail with FK constraint
-        // or it may delete customer and leave profile broken (bad).
-        // In a tutorial, this is the point: you need explicit lifecycle handling.
-//        assertThatThrownBy(() -> {
-//            customerRepo.deleteById(id);
-//            customerRepo.flush();
-//        }).isInstanceOfAny(Exception.class);
+        Long sharedId = customer.getId();
 
-        // Clean up explicitly (what a service would do):
-        profileRepo.deleteById(id);
-        profileRepo.flush();
+        profileRepository.deleteById(sharedId);
+        profileRepository.flush();
 
-        customerRepo.deleteById(id);
-        customerRepo.flush();
+        customerRepository.deleteById(sharedId);
+        customerRepository.flush();
 
-        assertThat(profileRepo.findById(id)).isNotPresent();
-        assertThat(customerRepo.findById(id)).isNotPresent();
+        assertThat(profileRepository.findById(sharedId)).isNotPresent();
+        assertThat(customerRepository.findById(sharedId)).isNotPresent();
     }
 }

@@ -11,18 +11,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DataJpaTest
 class VariantE_DataJpaTest {
 
-    @Autowired
-    CustomerERepository customerRepository;
-
-    @Autowired
-    ProfileERepository profileRepository;
+    @Autowired CustomerERepository customerRepository;
+    @Autowired ProfileERepository profileRepository;
 
     @Test
-    void savesProfileWithCustomer() {
+    void serviceManagedRelationship_savesProfileWithCustomer() {
         CustomerE customer = customerRepository.saveAndFlush(new CustomerE("Alice"));
 
         ProfileE profile = new ProfileE(customer, true);
-        profile = profileRepository.saveAndFlush(profile);
+        profileRepository.saveAndFlush(profile);
 
         assertThat(profile.getId()).isNotNull();
         assertThat(profile.getCustomer()).isNotNull();
@@ -31,11 +28,10 @@ class VariantE_DataJpaTest {
     }
 
     @Test
-    void uniqueConstraintPreventsTwoProfilesForSameCustomer() {
+    void uniqueConstraint_preventsTwoProfilesForSameCustomer() {
         CustomerE customer = customerRepository.saveAndFlush(new CustomerE("Alice"));
 
-        ProfileE first = new ProfileE(customer, true);
-        profileRepository.saveAndFlush(first);
+        profileRepository.saveAndFlush(new ProfileE(customer, true));
 
         ProfileE second = new ProfileE(customer, false);
 

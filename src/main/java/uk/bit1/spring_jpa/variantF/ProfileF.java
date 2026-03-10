@@ -37,7 +37,7 @@ public class ProfileF {
         this.marketingOptIn = marketingOptIn;
     }
 
-    // no lifecycle management for Customer
+    // no lifecycle management
     // relationship is managed from the Service layer
 }
 

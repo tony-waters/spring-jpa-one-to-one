@@ -10,40 +10,31 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class CustomerD_ProfileLazyLoadingTest {
+class CustomerD_ProfileLazyLoadingObservationTest {
 
-    @Autowired
-    CustomerDRepository customerRepository;
-
-    @Autowired
-    EntityManager entityManager;
+    @Autowired CustomerDRepository customerRepository;
+    @Autowired EntityManager entityManager;
 
     @Test
     @Transactional
-    void profileIsLoadedLazily() {
+    void profileIsObservedAsLazyInThisHibernateSetup() {
+        CustomerD customer = new CustomerD("Dan");
+        customer.createProfile(true);
+        customerRepository.saveAndFlush(customer);
 
-        // given
-        CustomerD c = new CustomerD("Alice");
-        c.createProfile(true);
-        customerRepository.saveAndFlush(c);
+        entityManager.clear();
 
-        entityManager.clear(); // detach everything
+        CustomerD loaded = customerRepository.findById(customer.getId()).orElseThrow();
 
-        // when
-        CustomerD loaded = customerRepository.findById(c.getId()).orElseThrow();
-
-        // then
         assertThat(Hibernate.isInitialized(loaded.getProfile()))
-                .as("Profile should NOT be initialized yet")
+                .as("Observed Hibernate behaviour: profile is not initialized yet")
                 .isFalse();
 
-        // accessing it should initialize it
         boolean marketingOptIn = loaded.getProfile().isMarketingOptIn();
 
+        assertThat(marketingOptIn).isTrue();
         assertThat(Hibernate.isInitialized(loaded.getProfile()))
-                .as("Profile should now be initialized")
+                .as("Observed Hibernate behaviour: accessing profile initializes it")
                 .isTrue();
-
-        assertThat(marketingOptIn).isEqualTo(true);
     }
 }

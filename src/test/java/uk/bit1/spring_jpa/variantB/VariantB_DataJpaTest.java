@@ -4,46 +4,63 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class VariantB_DataJpaTest {
 
-    @Autowired CustomerBRepository customerRepo;
-    @Autowired ProfileBRepository profileRepo;
+    @Autowired CustomerBRepository customerRepository;
+    @Autowired ProfileBRepository profileRepository;
 
     @Test
-    void cascadePersistsProfile_andProfileHoldsUniqueCustomerFk() {
-        CustomerB c = new CustomerB("Bob");
-        ProfileB p = c.createProfile(true);
+    void cascadePersist_savesCustomerAndProfile_andOwnerHoldsForeignKey() {
+        CustomerB customer = new CustomerB("Bob");
+        ProfileB profile = customer.createProfile(true);
 
-        customerRepo.saveAndFlush(c);
+        customerRepository.saveAndFlush(customer);
 
-        assertThat(c.getId()).isNotNull();
-        assertThat(p.getId()).isNotNull();
+        assertThat(customer.getId()).isNotNull();
+        assertThat(profile.getId()).isNotNull();
 
-        ProfileB reloadedProfile = profileRepo.findById(p.getId()).orElseThrow();
+        ProfileB reloadedProfile = profileRepository.findById(profile.getId()).orElseThrow();
         assertThat(reloadedProfile.getCustomer()).isNotNull();
-        assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(c.getId());
+        assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(customer.getId());
 
-        CustomerB reloadedCustomer = customerRepo.findById(c.getId()).orElseThrow();
+        CustomerB reloadedCustomer = customerRepository.findById(customer.getId()).orElseThrow();
         assertThat(reloadedCustomer.getProfile()).isNotNull();
-        assertThat(reloadedCustomer.getProfile().getId()).isEqualTo(p.getId());
+        assertThat(reloadedCustomer.getProfile().getId()).isEqualTo(profile.getId());
     }
 
     @Test
-    void orphanRemovalDeletesProfileRow_whenCustomerDropsReference() {
-        CustomerB c = new CustomerB("Bob");
-        ProfileB p = c.createProfile(false);
+    void removingProfile_fromParent_triggersOrphanRemoval_andDeletesProfileRow() {
+        CustomerB customer = new CustomerB("Bob");
+        ProfileB profile = customer.createProfile(false);
 
-        customerRepo.saveAndFlush(c);
-        Long profileId = p.getId();
-        assertThat(profileRepo.findById(profileId)).isPresent();
+        customerRepository.saveAndFlush(customer);
+        Long profileId = profile.getId();
 
-        CustomerB managed = customerRepo.findById(c.getId()).orElseThrow();
+        assertThat(profileRepository.findById(profileId)).isPresent();
+
+        CustomerB managed = customerRepository.findById(customer.getId()).orElseThrow();
         managed.removeProfile();
-        customerRepo.saveAndFlush(managed);
+        customerRepository.saveAndFlush(managed);
 
-        assertThat(profileRepo.findById(profileId)).isNotPresent();
+        assertThat(profileRepository.findById(profileId)).isNotPresent();
+    }
+
+    @Test
+    void deletingCustomer_cascadesDeleteToProfile() {
+        CustomerB customer = new CustomerB("Bob");
+        ProfileB profile = customer.createProfile(true);
+
+        customerRepository.saveAndFlush(customer);
+        Long customerId = customer.getId();
+        Long profileId = profile.getId();
+
+        customerRepository.deleteById(customerId);
+        customerRepository.flush();
+
+        assertThat(customerRepository.findById(customerId)).isNotPresent();
+        assertThat(profileRepository.findById(profileId)).isNotPresent();
     }
 }

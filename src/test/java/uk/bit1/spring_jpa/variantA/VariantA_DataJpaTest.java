@@ -4,63 +4,63 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class VariantA_DataJpaTest {
 
-    @Autowired CustomerARepository customerRepo;
-    @Autowired ProfileARepository profileRepo;
+    @Autowired CustomerARepository customerRepository;
+    @Autowired ProfileARepository profileRepository;
 
     @Test
-    void cascadePersistsProfile_andBidirectionalNavigationWorks() {
-        CustomerA c = new CustomerA("Alice");
-        ProfileA p = c.createProfile(true);
+    void cascadePersist_savesCustomerAndProfile_andKeepsBidirectionalLinks() {
+        CustomerA customer = new CustomerA("Alice");
+        ProfileA profile = customer.createProfile(true);
 
-        customerRepo.saveAndFlush(c);
+        customerRepository.saveAndFlush(customer);
 
-        assertThat(c.getId()).isNotNull();
-        assertThat(p.getId()).isNotNull();
+        assertThat(customer.getId()).isNotNull();
+        assertThat(profile.getId()).isNotNull();
 
-        CustomerA reloadedCustomer = customerRepo.findById(c.getId()).orElseThrow();
+        CustomerA reloadedCustomer = customerRepository.findById(customer.getId()).orElseThrow();
         assertThat(reloadedCustomer.getProfile()).isNotNull();
         assertThat(reloadedCustomer.getProfile().isMarketingOptIn()).isTrue();
 
-        ProfileA reloadedProfile = profileRepo.findById(p.getId()).orElseThrow();
+        ProfileA reloadedProfile = profileRepository.findById(profile.getId()).orElseThrow();
         assertThat(reloadedProfile.getCustomer()).isNotNull();
-        assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(c.getId());
+        assertThat(reloadedProfile.getCustomer().getId()).isEqualTo(customer.getId());
     }
 
     @Test
-    void orphanRemovalDeletesProfileRow() {
-        CustomerA c = new CustomerA("Alice");
-        ProfileA p = c.createProfile(false);
+    void removingProfile_triggersOrphanRemoval_andDeletesProfileRow() {
+        CustomerA customer = new CustomerA("Alice");
+        ProfileA profile = customer.createProfile(false);
 
-        customerRepo.saveAndFlush(c);
-        Long profileId = p.getId();
-        assertThat(profileId).isNotNull();
-        assertThat(profileRepo.findById(profileId)).isPresent();
+        customerRepository.saveAndFlush(customer);
+        Long profileId = profile.getId();
 
-        CustomerA managed = customerRepo.findById(c.getId()).orElseThrow();
+        assertThat(profileRepository.findById(profileId)).isPresent();
+
+        CustomerA managed = customerRepository.findById(customer.getId()).orElseThrow();
         managed.removeProfile();
-        customerRepo.saveAndFlush(managed);
+        customerRepository.saveAndFlush(managed);
 
-        assertThat(profileRepo.findById(profileId)).isNotPresent();
+        assertThat(profileRepository.findById(profileId)).isNotPresent();
     }
 
     @Test
-    void profileNotEagerlyFetched() {
-        CustomerA c = new CustomerA("Alice");
-        ProfileA p = c.createProfile(false);
-        customerRepo.saveAndFlush(c);
-        long id = c.getId();
-        c = null;
-        p = null;
+    void deletingCustomer_cascadesDeleteToProfile() {
+        CustomerA customer = new CustomerA("Alice");
+        ProfileA profile = customer.createProfile(true);
 
-        assertThat(customerRepo.findById(id)).isPresent();
-//        CustomerA foundCustomer = customerRepo.findById(id).orElseThrow();
-//        assertThat(foundCustomer).isNotNull();
+        customerRepository.saveAndFlush(customer);
+        Long customerId = customer.getId();
+        Long profileId = profile.getId();
 
+        customerRepository.deleteById(customerId);
+        customerRepository.flush();
+
+        assertThat(customerRepository.findById(customerId)).isNotPresent();
+        assertThat(profileRepository.findById(profileId)).isNotPresent();
     }
-
 }
