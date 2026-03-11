@@ -21,7 +21,7 @@ public class ProfileC {
             name = "customer_id",
             nullable = false
     )
-    @Getter(AccessLevel.PROTECTED)
+    @Getter
     private CustomerC customer;
 
     @Getter
@@ -42,9 +42,9 @@ public class ProfileC {
         this.customer = customer;
     }
 
-    void clearCustomerInternal() {
-        this.customer = null;
-    }
+//    void clearCustomerInternal() {
+//        this.customer = null;
+//    }
 
 }
 

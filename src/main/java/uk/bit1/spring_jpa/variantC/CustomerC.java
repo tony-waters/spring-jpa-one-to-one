@@ -52,9 +52,7 @@ public class CustomerC {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");
         }
-        ProfileC oldProfile = this.profile;
         this.profile = null;
-        oldProfile.clearCustomerInternal();
     }
 
 }

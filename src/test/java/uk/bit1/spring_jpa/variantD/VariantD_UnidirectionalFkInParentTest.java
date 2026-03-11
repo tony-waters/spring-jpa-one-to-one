@@ -3,17 +3,21 @@ package uk.bit1.spring_jpa.variantD;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import uk.bit1.spring_jpa.support.SchemaAssertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 class VariantD_UnidirectionalFkInParentTest {
 
     @Autowired CustomerDRepository customerRepository;
     @Autowired ProfileDRepository profileRepository;
+    @Autowired JdbcTemplate jdbc;
 
     @Test
-    void cascadePersist_savesCustomerAndProfile_withoutBackReference() {
+    void savingCustomer_cascadesPersistToProfile_withoutBackReference() {
         CustomerD customer = new CustomerD("Dan");
         ProfileD profile = customer.createProfile(true);
 
@@ -59,4 +63,67 @@ class VariantD_UnidirectionalFkInParentTest {
         assertThat(customerRepository.findById(customerId)).isNotPresent();
         assertThat(profileRepository.findById(profileId)).isNotPresent();
     }
+
+    @Test
+    void schema_fkColumnExistsOnCustomerTable_notProfileTable() {
+        assertThat(SchemaAssertion.columnExists(jdbc, "customer_d", "profile_id")).isTrue();
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_d", "customer_id")).isFalse();
+    }
+
+    @Test
+    void schema_customerProfileId_isUnique() {
+        assertThat(SchemaAssertion.uniqueConstraintExistsForColumn(jdbc, "customer_d", "profile_id")).isTrue();
+    }
+
+    @Test
+    void schema_foreignKeyExistsOnCustomerProfileId() {
+        Integer count = jdbc.queryForObject("""
+        select count(*)
+        from information_schema.table_constraints tc
+        join information_schema.key_column_usage kcu
+          on tc.constraint_name = kcu.constraint_name
+         and tc.table_schema = kcu.table_schema
+         and tc.table_name = kcu.table_name
+        where tc.constraint_type = 'FOREIGN KEY'
+          and upper(tc.table_name) = 'CUSTOMER_D'
+          and upper(kcu.column_name) = 'PROFILE_ID'
+        """, Integer.class);
+
+        assertThat(count).isGreaterThan(0);
+    }
+
+    @Test
+    void persistedRows_storeFkOnCustomerRow() {
+        CustomerD customer = new CustomerD("Dan");
+        ProfileD profile = customer.createProfile(true);
+
+        customerRepository.saveAndFlush(customer);
+
+        Long fkValue = jdbc.queryForObject(
+                "select profile_id from customer_d where id = ?",
+                Long.class,
+                customer.getId()
+        );
+
+        assertThat(fkValue).isEqualTo(profile.getId());
+    }
+
+    @Test
+    void createProfile_whenProfileAlreadyExists_throws() {
+        CustomerD customer = new CustomerD("Dan");
+        customer.createProfile(true);
+
+        assertThatThrownBy(() -> customer.createProfile(false))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void removeProfile_whenNoProfileExists_throws() {
+        CustomerD customer = new CustomerD("Dan");
+
+        assertThatThrownBy(customer::removeProfile)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Customer has no Profile to remove");
+    }
+
 }

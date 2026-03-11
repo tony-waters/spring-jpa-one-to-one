@@ -23,7 +23,8 @@ public class CustomerD {
     )
     @JoinColumn(
             name = "profile_id",
-            unique = true
+            unique = true,
+            nullable = true
     )
     @Getter // since Profile does not reference Customer no reason to not provide a public getter
     private ProfileD profile;
