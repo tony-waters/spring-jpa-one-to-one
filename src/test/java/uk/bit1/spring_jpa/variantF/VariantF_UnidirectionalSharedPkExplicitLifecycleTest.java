@@ -1,8 +1,14 @@
 package uk.bit1.spring_jpa.variantF;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import uk.bit1.spring_jpa.support.SchemaAssertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,9 +18,11 @@ class VariantF_UnidirectionalSharedPkExplicitLifecycleTest {
 
     @Autowired CustomerFRepository customerRepository;
     @Autowired ProfileFRepository profileRepository;
+    @Autowired JdbcTemplate jdbc;
+    @PersistenceContext EntityManager entityManager;
 
     @Test
-    void mapsId_profileSharesPrimaryKeyWithCustomer_whenSavedSeparately() {
+    void savingProfileAfterPersistingCustomer_usesCustomerIdAsProfileId() {
         CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
 
         ProfileF profile = new ProfileF(customer, true);
@@ -26,25 +34,9 @@ class VariantF_UnidirectionalSharedPkExplicitLifecycleTest {
     }
 
     @Test
-    void savingProfileWithTransientCustomer_persistsBothInThisHibernateSetup() {
-        // In this setup, Hibernate chooses to persist the referenced parent automatically
-        // so it can satisfy the derived identity relationship.
-        // ... this is not guaranteed for other setups
-        CustomerF transientCustomer = new CustomerF("Eve");
-        ProfileF profile = new ProfileF(transientCustomer, false);
-
-        profileRepository.saveAndFlush(profile);
-
-        assertThat(transientCustomer.getId()).isNotNull();
-        assertThat(profile.getId()).isEqualTo(transientCustomer.getId());
-        assertThat(customerRepository.findById(transientCustomer.getId())).isPresent();
-        assertThat(profileRepository.findById(transientCustomer.getId())).isPresent();
-    }
-
-    @Test
-    void explicitDeleteOfProfileThenCustomerWorksInServiceManagedModel() {
+    void deletingProfileThenCustomer_succeedsWhenDoneInCorrectOrder() {
         CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
-        ProfileF profile = profileRepository.saveAndFlush(new ProfileF(customer, false));
+        profileRepository.saveAndFlush(new ProfileF(customer, false));
 
         Long sharedId = customer.getId();
 
@@ -57,4 +49,100 @@ class VariantF_UnidirectionalSharedPkExplicitLifecycleTest {
         assertThat(profileRepository.findById(sharedId)).isNotPresent();
         assertThat(customerRepository.findById(sharedId)).isNotPresent();
     }
+
+    @Test
+    void persistedProfileRow_usesSameIdentifierAsCustomer() {
+        CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
+        ProfileF profile = profileRepository.saveAndFlush(new ProfileF(customer, true));
+
+        Long profileId = jdbc.queryForObject(
+                "select customer_id from profile_f where customer_id = ?",
+                Long.class,
+                customer.getId()
+        );
+
+        assertThat(profileId).isEqualTo(customer.getId());
+        assertThat(profileId).isEqualTo(profile.getId());
+    }
+
+    @Test
+    void deletingManagedCustomerWhileManagedProfileStillReferencesIt_failsAtOrmLevel() {
+        CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
+        profileRepository.saveAndFlush(new ProfileF(customer, true));
+
+        assertThatThrownBy(() -> {
+            customerRepository.delete(customer);
+            customerRepository.flush();
+        }).isInstanceOf(InvalidDataAccessApiUsageException.class);
+    }
+
+    @Test
+    void deletingCustomerRowBeforeProfileRow_failsWithConstraintViolationAtDatabaseLevel() {
+        CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
+        profileRepository.saveAndFlush(new ProfileF(customer, true));
+
+        Long customerId = customer.getId();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThatThrownBy(() -> {
+            customerRepository.deleteById(customerId);
+            customerRepository.flush();
+        }).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void secondProfileForSameCustomer_failsAndLeavesOriginalProfileIntact() {
+        CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
+        ProfileF first = profileRepository.saveAndFlush(new ProfileF(customer, true));
+
+        ProfileF second = new ProfileF(customer, false);
+
+        assertThatThrownBy(() -> profileRepository.saveAndFlush(second))
+                .isInstanceOf(DataIntegrityViolationException.class);
+
+        assertThat(profileRepository.findById(first.getId())).isPresent();
+    }
+
+    @Test
+    void schema_profileTableDoesNotHaveSeparateIdColumn() {
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_f", "id")).isFalse();
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_f", "customer_id")).isTrue();
+    }
+
+    @Test
+    void schema_foreignKeyExistsOnProfileCustomerId() {
+        Integer count = jdbc.queryForObject("""
+        select count(*)
+        from information_schema.table_constraints tc
+        join information_schema.key_column_usage kcu
+          on tc.constraint_name = kcu.constraint_name
+         and tc.table_schema = kcu.table_schema
+         and tc.table_name = kcu.table_name
+        where tc.constraint_type = 'FOREIGN KEY'
+          and upper(tc.table_name) = 'PROFILE_F'
+          and upper(kcu.column_name) = 'CUSTOMER_ID'
+        """, Integer.class);
+
+        assertThat(count).isGreaterThan(0);
+    }
+
+    @Test
+    void schema_customerIdIsPrimaryKeyColumnOfProfileTable() {
+        Integer count = jdbc.queryForObject("""
+        select count(*)
+        from information_schema.table_constraints tc
+        join information_schema.key_column_usage kcu
+          on tc.constraint_name = kcu.constraint_name
+         and tc.table_schema = kcu.table_schema
+         and tc.table_name = kcu.table_name
+        where tc.constraint_type = 'PRIMARY KEY'
+          and upper(tc.table_name) = 'PROFILE_F'
+          and upper(kcu.column_name) = 'CUSTOMER_ID'
+        """, Integer.class);
+
+        assertThat(count).isGreaterThan(0);
+    }
+
 }

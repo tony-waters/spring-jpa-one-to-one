@@ -3,6 +3,8 @@ package uk.bit1.spring_jpa.variantB;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import uk.bit1.spring_jpa.support.SchemaAssertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,6 +13,8 @@ class VariantB_BidirectionalFkInChildTest {
 
     @Autowired CustomerBRepository customerRepository;
     @Autowired ProfileBRepository profileRepository;
+    @Autowired JdbcTemplate jdbc;
+
 
     @Test
     void cascadePersist_savesCustomerAndProfile_andOwnerHoldsForeignKey() {
@@ -63,4 +67,31 @@ class VariantB_BidirectionalFkInChildTest {
         assertThat(customerRepository.findById(customerId)).isNotPresent();
         assertThat(profileRepository.findById(profileId)).isNotPresent();
     }
+
+    @Test
+    void schema_fkColumnExistsOnProfileTable_notCustomerTable() {
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_b", "customer_id")).isTrue();
+        assertThat(SchemaAssertion.columnExists(jdbc, "customer_b", "profile_id")).isFalse();
+    }
+
+    @Test
+    void schema_customerFkInProfile_isUnique() {
+        assertThat(SchemaAssertion.uniqueConstraintExistsForColumn(jdbc, "profile_b", "customer_id")).isTrue();
+    }
+
+    @Test
+    void persistedRows_storeFkOnProfileRow() {
+        CustomerB customer = new CustomerB("Bob");
+        ProfileB profile = customer.createProfile(true);
+        customerRepository.saveAndFlush(customer);
+
+        Long fkValue = jdbc.queryForObject(
+                "select customer_id from profile_b where id = ?",
+                Long.class,
+                profile.getId()
+        );
+
+        assertThat(fkValue).isEqualTo(customer.getId());
+    }
+
 }

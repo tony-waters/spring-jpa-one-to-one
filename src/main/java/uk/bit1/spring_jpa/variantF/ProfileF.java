@@ -12,7 +12,7 @@ public class ProfileF {
 
     @Id
     @Getter
-    private Long id; // no @GeneratedValue — comes from Customer via @MapsId
+    private Long id; // no @GeneratedValue — derived from customer.id via @MapsId
 
     @OneToOne(
             optional = false // child must always reference a parent
@@ -29,6 +29,7 @@ public class ProfileF {
     @Column(nullable = false)
     private boolean marketingOptIn = false;
 
+    // made public for testing hibernate behaviour
     public ProfileF(CustomerF customer, boolean marketingOptIn) {
         if (customer == null) {
             throw new IllegalArgumentException("customer must not be null");
@@ -37,7 +38,8 @@ public class ProfileF {
         this.marketingOptIn = marketingOptIn;
     }
 
-    // no lifecycle management
-    // relationship is managed from the Service layer
+    // No bidirectional helper methods.
+    // Caller must persist and delete in the correct order.
+    // (this would be pushed to the Service layer)
 }
 

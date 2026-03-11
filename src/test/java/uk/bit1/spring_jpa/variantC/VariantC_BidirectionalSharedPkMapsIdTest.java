@@ -3,6 +3,8 @@ package uk.bit1.spring_jpa.variantC;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import uk.bit1.spring_jpa.support.SchemaAssertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,6 +13,7 @@ class VariantC_BidirectionalSharedPkMapsIdTest {
 
     @Autowired CustomerCRepository customerRepository;
     @Autowired ProfileCRepository profileRepository;
+    @Autowired JdbcTemplate jdbc;
 
     @Test
     void mapsId_profileSharesPrimaryKeyWithCustomer() {
@@ -60,5 +63,28 @@ class VariantC_BidirectionalSharedPkMapsIdTest {
 
         assertThat(customerRepository.findById(sharedId)).isNotPresent();
         assertThat(profileRepository.findById(sharedId)).isNotPresent();
+    }
+
+    @Test
+    void schema_profilePrimaryKeyIsSameAsCustomerPrimaryKey() {
+
+        CustomerC customer = new CustomerC("Carol");
+        ProfileC profile = customer.createProfile(true);
+
+        customerRepository.saveAndFlush(customer);
+
+        Long profileId = jdbc.queryForObject(
+                "select customer_id from profile_c where customer_id = ?",
+                Long.class,
+                customer.getId()
+        );
+
+        assertThat(profileId).isEqualTo(customer.getId());
+        assertThat(profileId).isEqualTo(profile.getId());
+    }
+
+    @Test
+    void schema_profileTableUsesSharedPrimaryKeyColumn() {
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_c", "customer_id")).isTrue();
     }
 }

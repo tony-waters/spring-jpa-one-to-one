@@ -12,7 +12,7 @@ import uk.bit1.spring_jpa.variantD.CustomerDRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class CustomerD_ProfileLazyLoadingObservationTest {
+class VariantD_ProfileLazyLoadingObservationTest {
 
     @Autowired
     CustomerDRepository customerRepository;
