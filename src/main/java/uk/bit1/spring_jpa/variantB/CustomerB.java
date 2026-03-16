@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant B: bidirectional one-to-one with foreign key in child.
+ * CustomerB is inverse side; ProfileB owns the relationship.
+ */
 @Entity
 @Table(name = "CUSTOMER_B")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,6 +22,7 @@ public class CustomerB {
     @Getter
     // Inverse Side
     @OneToOne(
+            fetch = FetchType.LAZY,
             mappedBy = "customer", // think 'profile.customer'
             cascade = CascadeType.ALL, // 'cascade' is on the Parent Side
             orphanRemoval = true // 'orphanRemoval' is on the Parent side
@@ -52,7 +57,7 @@ public class CustomerB {
         }
         ProfileB old = this.profile;
         this.profile = null;
-        old.clearCustomerInternal();
+        // cascade and orphan removal takes care of Profile
     }
 
 }

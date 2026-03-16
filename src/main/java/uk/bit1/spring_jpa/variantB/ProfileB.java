@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant B: bidirectional one-to-one with foreign key in child.
+ * CustomerB is inverse side; ProfileB owns the relationship.
+ */
 @Entity
 @Table(name = "PROFILE_B")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,14 +43,10 @@ public class ProfileB {
         if (customer == null) {
             throw new IllegalArgumentException("Profile must have a Customer");
         }
-        if (this.customer != null && !this.customer.equals(customer)) {
+        if (this.customer != null && this.customer != customer) {
             throw new IllegalStateException("Profile cannot be moved to another Customer");
         }
         this.customer = customer;
-    }
-
-    void clearCustomerInternal() {
-        this.customer = null;
     }
 
 }
