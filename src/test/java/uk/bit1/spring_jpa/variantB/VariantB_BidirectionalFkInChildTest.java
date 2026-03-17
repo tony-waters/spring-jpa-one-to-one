@@ -109,7 +109,7 @@ class VariantB_BidirectionalFkInChildTest {
     @Test
     void databaseUniqueConstraint_preventsTwoProfilesForSameCustomer() {
         CustomerB customer = new CustomerB("Bob");
-        customer.createProfile(true);
+        ProfileB first = customer.createProfile(true);
         customerRepository.saveAndFlush(customer);
 
         CustomerB managedCustomer = customerRepository.findById(customer.getId()).orElseThrow();
@@ -119,6 +119,8 @@ class VariantB_BidirectionalFkInChildTest {
 
         assertThatThrownBy(() -> profileRepository.saveAndFlush(second))
                 .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+
+        assertThat(profileRepository.findById(first.getId())).isPresent();
     }
 
     @Test
