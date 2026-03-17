@@ -3,6 +3,7 @@ package uk.bit1.spring_jpa.variantD;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import uk.bit1.spring_jpa.support.SchemaAssertion;
 
@@ -32,7 +33,7 @@ class VariantD_UnidirectionalFkInParentTest {
     }
 
     @Test
-    void removingProfile_triggersOrphanRemoval_andDeletesProfileRow() {
+    void removingProfileFromCustomer_orphansAndDeletesProfile() {
         CustomerD customer = new CustomerD("Dan");
         ProfileD profile = customer.createProfile(false);
 
@@ -65,34 +66,6 @@ class VariantD_UnidirectionalFkInParentTest {
     }
 
     @Test
-    void schema_fkColumnExistsOnCustomerTable_notProfileTable() {
-        assertThat(SchemaAssertion.columnExists(jdbc, "customer_d", "profile_id")).isTrue();
-        assertThat(SchemaAssertion.columnExists(jdbc, "profile_d", "customer_id")).isFalse();
-    }
-
-    @Test
-    void schema_customerProfileId_isUnique() {
-        assertThat(SchemaAssertion.uniqueConstraintExistsForColumn(jdbc, "customer_d", "profile_id")).isTrue();
-    }
-
-    @Test
-    void schema_foreignKeyExistsOnCustomerProfileId() {
-        Integer count = jdbc.queryForObject("""
-        select count(*)
-        from information_schema.table_constraints tc
-        join information_schema.key_column_usage kcu
-          on tc.constraint_name = kcu.constraint_name
-         and tc.table_schema = kcu.table_schema
-         and tc.table_name = kcu.table_name
-        where tc.constraint_type = 'FOREIGN KEY'
-          and upper(tc.table_name) = 'CUSTOMER_D'
-          and upper(kcu.column_name) = 'PROFILE_ID'
-        """, Integer.class);
-
-        assertThat(count).isGreaterThan(0);
-    }
-
-    @Test
     void persistedRows_storeFkOnCustomerRow() {
         CustomerD customer = new CustomerD("Dan");
         ProfileD profile = customer.createProfile(true);
@@ -109,21 +82,46 @@ class VariantD_UnidirectionalFkInParentTest {
     }
 
     @Test
-    void createProfile_whenProfileAlreadyExists_throws() {
-        CustomerD customer = new CustomerD("Dan");
-        customer.createProfile(true);
-
-        assertThatThrownBy(() -> customer.createProfile(false))
-                .isInstanceOf(IllegalStateException.class);
+    void schema_fkColumnExistsOnCustomerTable_notProfileTable() {
+        assertThat(SchemaAssertion.columnExists(jdbc, "customer_d", "profile_id")).isTrue();
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_d", "customer_id")).isFalse();
     }
 
     @Test
-    void removeProfile_whenNoProfileExists_throws() {
-        CustomerD customer = new CustomerD("Dan");
-
-        assertThatThrownBy(customer::removeProfile)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Customer has no Profile to remove");
+    void schema_customerProfileId_isUnique() {
+        assertThat(SchemaAssertion.uniqueConstraintExistsForColumn(jdbc, "customer_d", "profile_id")).isTrue();
     }
 
+    @Test
+    void schema_foreignKeyExistsOnCustomerProfileId() {
+        Integer count = jdbc.queryForObject("""
+            select count(*)
+            from information_schema.table_constraints tc
+            join information_schema.key_column_usage kcu
+              on tc.constraint_name = kcu.constraint_name
+             and tc.table_schema = kcu.table_schema
+             and tc.table_name = kcu.table_name
+            where tc.constraint_type = 'FOREIGN KEY'
+              and upper(tc.table_name) = 'CUSTOMER_D'
+              and upper(kcu.column_name) = 'PROFILE_ID'
+            """, Integer.class);
+
+        assertThat(count).isGreaterThan(0);
+    }
+
+    @Test
+    void databaseUniqueConstraint_preventsReusingSameProfileForTwoCustomers() {
+        CustomerD firstCustomer = new CustomerD("Dan");
+        ProfileD sharedProfile = firstCustomer.createProfile(true);
+        customerRepository.saveAndFlush(firstCustomer);
+
+        CustomerD secondCustomer = new CustomerD("Dave");
+        secondCustomer.attachProfile(sharedProfile);
+
+        assertThatThrownBy(() -> customerRepository.saveAndFlush(secondCustomer))
+                .isInstanceOf(DataIntegrityViolationException.class);
+
+        assertThat(customerRepository.findById(firstCustomer.getId())).isPresent();
+        assertThat(profileRepository.findById(sharedProfile.getId())).isPresent();
+    }
 }

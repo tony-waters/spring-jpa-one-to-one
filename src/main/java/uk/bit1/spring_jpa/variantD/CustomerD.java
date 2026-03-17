@@ -11,11 +11,10 @@ import lombok.NoArgsConstructor;
 public class CustomerD {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Unidirectional - Profile does NOT know about Customer
     @OneToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
@@ -26,7 +25,7 @@ public class CustomerD {
             unique = true,
             nullable = true
     )
-    @Getter // since Profile does not reference Customer no reason to not provide a public getter
+    @Getter
     private ProfileD profile;
 
     @Getter
@@ -34,13 +33,13 @@ public class CustomerD {
     private String displayName;
 
     public CustomerD(String displayName) {
-        if(displayName == null || displayName.isBlank()) {
+        String normalized = displayName == null ? null : displayName.strip();
+        if (normalized == null || normalized.isEmpty()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
-        this.displayName = displayName.strip();
+        this.displayName = normalized;
     }
 
-    // Parent side - lifecycle control lives here
     public ProfileD createProfile(boolean marketingOptIn) {
         if (this.profile != null) {
             throw new IllegalStateException("Customer already has a Profile");
@@ -49,12 +48,20 @@ public class CustomerD {
         return profile;
     }
 
-    // Parent side - lifecycle control lives here
+    public void attachProfile(ProfileD profile) {
+        if (profile == null) {
+            throw new IllegalArgumentException("profile must not be null");
+        }
+        if (this.profile != null) {
+            throw new IllegalStateException("Customer already has a Profile");
+        }
+        this.profile = profile;
+    }
+
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");
         }
         this.profile = null;
     }
-
 }

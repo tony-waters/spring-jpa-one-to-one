@@ -5,10 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// Profile is the Inverse side
-// Profile is the Child side
-// relationship is bidirectional
-
 @Entity
 @Table(name = "PROFILE_A")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
