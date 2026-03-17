@@ -36,7 +36,7 @@ public class ProfileC {
         if (customer == null) {
             throw new IllegalArgumentException("Profile must have a Customer");
         }
-        if (this.customer != null && !this.customer.equals(customer)) {
+        if (this.customer != null && this.customer != customer) {
             throw new IllegalStateException("Profile cannot be moved to another Customer");
         }
         this.customer = customer;
