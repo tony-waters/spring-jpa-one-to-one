@@ -15,18 +15,15 @@ import lombok.NoArgsConstructor;
 public class ProfileB {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Owning side: FK lives in 'profile' table (customer_id)
-    @OneToOne(
-            optional = false
-    )
-    @JoinColumn( // Owner side is here
+    @OneToOne(optional = false)
+    @JoinColumn(
             name = "customer_id",
             nullable = false,
-            unique = true // enforce 1-1 relationship
+            unique = true
     )
     @Getter(AccessLevel.PROTECTED)
     private CustomerB customer;
@@ -49,5 +46,7 @@ public class ProfileB {
         this.customer = customer;
     }
 
+    void clearCustomerInternal() {
+        this.customer = null;
+    }
 }
-

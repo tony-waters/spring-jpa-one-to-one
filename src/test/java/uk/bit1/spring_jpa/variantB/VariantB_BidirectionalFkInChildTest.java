@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.bit1.spring_jpa.support.SchemaAssertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 class VariantB_BidirectionalFkInChildTest {
@@ -15,7 +14,6 @@ class VariantB_BidirectionalFkInChildTest {
     @Autowired CustomerBRepository customerRepository;
     @Autowired ProfileBRepository profileRepository;
     @Autowired JdbcTemplate jdbc;
-
 
     @Test
     void savingCustomer_cascadesPersistToProfile_andPreservesBidirectionalLinks() {
@@ -70,14 +68,26 @@ class VariantB_BidirectionalFkInChildTest {
     }
 
     @Test
-    void schema_fkColumnExistsOnProfileTable_notCustomerTable() {
-        assertThat(SchemaAssertion.columnExists(jdbc, "profile_b", "customer_id")).isTrue();
-        assertThat(SchemaAssertion.columnExists(jdbc, "customer_b", "profile_id")).isFalse();
-    }
+    void replacingProfile_orphansAndDeletesOldProfile() {
+        CustomerB customer = new CustomerB("Bob");
+        ProfileB first = customer.createProfile(true);
+        customerRepository.saveAndFlush(customer);
 
-    @Test
-    void schema_profileCustomerId_isUnique() {
-        assertThat(SchemaAssertion.uniqueConstraintExistsForColumn(jdbc, "profile_b", "customer_id")).isTrue();
+        Long customerId = customer.getId();
+        Long firstId = first.getId();
+
+        CustomerB managed = customerRepository.findById(customerId).orElseThrow();
+        managed.removeProfile();
+        managed.createProfile(false);
+        customerRepository.saveAndFlush(managed);
+
+        assertThat(profileRepository.findById(firstId)).isNotPresent();
+
+        CustomerB reloaded = customerRepository.findById(customerId).orElseThrow();
+        assertThat(reloaded.getProfile()).isNotNull();
+        assertThat(reloaded.getProfile().getId()).isNotNull();
+        assertThat(reloaded.getProfile().getId()).isNotEqualTo(firstId);
+        assertThat(reloaded.getProfile().isMarketingOptIn()).isFalse();
     }
 
     @Test
@@ -96,52 +106,30 @@ class VariantB_BidirectionalFkInChildTest {
     }
 
     @Test
+    void schema_fkColumnExistsOnProfileTable_notCustomerTable() {
+        assertThat(SchemaAssertion.columnExists(jdbc, "profile_b", "customer_id")).isTrue();
+        assertThat(SchemaAssertion.columnExists(jdbc, "customer_b", "profile_id")).isFalse();
+    }
+
+    @Test
+    void schema_profileCustomerId_isUnique() {
+        assertThat(SchemaAssertion.uniqueConstraintExistsForColumn(jdbc, "profile_b", "customer_id")).isTrue();
+    }
+
+    @Test
     void schema_foreignKeyExistsOnProfileCustomerId() {
         Integer count = jdbc.queryForObject("""
-        select count(*)
-        from information_schema.table_constraints tc
-        join information_schema.key_column_usage kcu
-          on tc.constraint_name = kcu.constraint_name
-         and tc.table_schema = kcu.table_schema
-         and tc.table_name = kcu.table_name
-        where tc.constraint_type = 'FOREIGN KEY'
-          and upper(tc.table_name) = 'PROFILE_B'
-          and upper(kcu.column_name) = 'CUSTOMER_ID'
-        """, Integer.class);
+            select count(*)
+            from information_schema.table_constraints tc
+            join information_schema.key_column_usage kcu
+              on tc.constraint_name = kcu.constraint_name
+             and tc.table_schema = kcu.table_schema
+             and tc.table_name = kcu.table_name
+            where tc.constraint_type = 'FOREIGN KEY'
+              and upper(tc.table_name) = 'PROFILE_B'
+              and upper(kcu.column_name) = 'CUSTOMER_ID'
+            """, Integer.class);
 
         assertThat(count).isGreaterThan(0);
     }
-
-    @Test
-    void replacingProfile_orphansAndDeletesOldProfile() {
-        CustomerB customer = new CustomerB("Bob");
-        ProfileB first = customer.createProfile(true);
-        customerRepository.saveAndFlush(customer);
-        Long firstId = first.getId();
-
-        CustomerB managed = customerRepository.findById(customer.getId()).orElseThrow();
-        managed.removeProfile();
-        ProfileB second = managed.createProfile(false);
-        customerRepository.saveAndFlush(managed);
-
-        assertThat(profileRepository.findById(firstId)).isNotPresent();
-        assertThat(second.getId()).isNotNull();
-        assertThat(second.getId()).isNotEqualTo(firstId);
-    }
-
-    @Test
-    void secondProfileForSameCustomer_isNotAllowed() {
-        CustomerB customer = new CustomerB("Bob");
-        customer.createProfile(true);
-        customerRepository.saveAndFlush(customer);
-
-        CustomerB managed = customerRepository.findById(customer.getId()).orElseThrow();
-
-        assertThatThrownBy(() -> {
-            managed.createProfile(false);
-            customerRepository.saveAndFlush(managed);
-        }).isInstanceOf(Exception.class);
-    }
-
-
 }

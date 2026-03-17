@@ -15,18 +15,17 @@ import lombok.NoArgsConstructor;
 public class CustomerB {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private Long id;
 
-    @Getter
-    // Inverse Side
     @OneToOne(
             fetch = FetchType.LAZY,
-            mappedBy = "customer", // think 'profile.customer'
-            cascade = CascadeType.ALL, // 'cascade' is on the Parent Side
-            orphanRemoval = true // 'orphanRemoval' is on the Parent side
+            mappedBy = "customer",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
+    @Getter
     private ProfileB profile;
 
     @Getter
@@ -34,23 +33,22 @@ public class CustomerB {
     private String displayName;
 
     public CustomerB(String displayName) {
-        if(displayName == null || displayName.isBlank()) {
+        String normalized = displayName == null ? null : displayName.strip();
+        if (normalized == null || normalized.isEmpty()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
-        this.displayName = displayName.strip();
+        this.displayName = normalized;
     }
 
-    // Parent side - lifecycle control lives here
     public ProfileB createProfile(boolean marketingOptIn) {
         if (this.profile != null) {
             throw new IllegalStateException("Customer already has a Profile");
         }
         this.profile = new ProfileB(marketingOptIn);
-        profile.setCustomerInternal(this);
+        this.profile.setCustomerInternal(this);
         return profile;
     }
 
-    // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");
@@ -59,5 +57,4 @@ public class CustomerB {
         this.profile = null;
         // cascade and orphan removal takes care of Profile
     }
-
 }
