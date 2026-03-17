@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.bit1.spring_jpa.support.SchemaAssertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 class VariantB_BidirectionalFkInChildTest {
@@ -103,6 +104,21 @@ class VariantB_BidirectionalFkInChildTest {
         );
 
         assertThat(fkValue).isEqualTo(customer.getId());
+    }
+
+    @Test
+    void databaseUniqueConstraint_preventsTwoProfilesForSameCustomer() {
+        CustomerB customer = new CustomerB("Bob");
+        customer.createProfile(true);
+        customerRepository.saveAndFlush(customer);
+
+        CustomerB managedCustomer = customerRepository.findById(customer.getId()).orElseThrow();
+
+        ProfileB second = new ProfileB(false);
+        second.setCustomerInternal(managedCustomer);
+
+        assertThatThrownBy(() -> profileRepository.saveAndFlush(second))
+                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
     }
 
     @Test
