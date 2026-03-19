@@ -1,11 +1,8 @@
 package uk.bit1.spring_jpa.hibernate;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import uk.bit1.spring_jpa.variantB.CustomerBRepository;
-import uk.bit1.spring_jpa.variantB.ProfileBRepository;
 import uk.bit1.spring_jpa.variantF.CustomerF;
 import uk.bit1.spring_jpa.variantF.CustomerFRepository;
 import uk.bit1.spring_jpa.variantF.ProfileF;
