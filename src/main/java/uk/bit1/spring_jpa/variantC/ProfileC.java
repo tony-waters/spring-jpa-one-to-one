@@ -5,17 +5,20 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant C: bidirectional one-to-one with shared primary key via @MapsId.
+ * ProfileC owns the relationship and derives its identifier from CustomerC.
+ */
 @Entity
-@Table(name = "PROFILE_C")
+@Table(name = "profile_c")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileC {
 
     @Id
     @Getter
-    private Long id; // no @GeneratedValue — comes from Customer via @MapsId
+    private Long id;
 
-    // Owning side
-    @OneToOne(optional = false) // child must always reference a parent
+    @OneToOne(optional = false)
     @MapsId
     @JoinColumn(
             name = "customer_id",
@@ -42,9 +45,7 @@ public class ProfileC {
         this.customer = customer;
     }
 
-//    void clearCustomerInternal() {
-//        this.customer = null;
-//    }
-
+    void clearCustomerInternal() {
+        this.customer = null;
+    }
 }
-

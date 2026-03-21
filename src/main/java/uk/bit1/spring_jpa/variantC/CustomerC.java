@@ -5,21 +5,24 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant C: bidirectional one-to-one with shared primary key via @MapsId.
+ * CustomerC is inverse side; ProfileC owns the relationship and shares the identifier.
+ */
 @Entity
-@Table(name = "CUSTOMER_C")
+@Table(name = "customer_c")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerC {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private Long id;
 
-    // Inverse side
-    @Getter(AccessLevel.PUBLIC)
+    @Getter
     @OneToOne(
-            mappedBy = "customer", // think 'Profile.customer'
-            fetch =  FetchType.LAZY, // this will not always work
+            mappedBy = "customer",
+            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
@@ -30,39 +33,29 @@ public class CustomerC {
     private String displayName;
 
     public CustomerC(String displayName) {
-        if(displayName == null || displayName.isBlank()) {
+        String normalized = (displayName == null ? null : displayName.strip());
+        if (normalized == null || normalized.isEmpty()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
-        this.displayName = displayName.strip();
+        this.displayName = normalized;
     }
 
-    // Parent side lifecycle control
     public ProfileC createProfile(boolean marketingOptIn) {
         if (this.profile != null) {
             throw new IllegalStateException("Customer already has a Profile");
         }
         ProfileC profile = new ProfileC(marketingOptIn);
-        profile.setCustomerInternal(this); // owning side first
-        this.profile = profile;            // inverse side second
+        profile.setCustomerInternal(this);
+        this.profile = profile;
         return profile;
     }
 
-    public void attachProfile(ProfileC profile) {
-        if(profile == null) {
-            throw new IllegalArgumentException("profile must not be null");
-        }
-        if (this.profile != null) {
-            throw new IllegalStateException("Customer already has a Profile");
-        }
-        this.profile = profile;
-    }
-
-    // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");
         }
+        ProfileC old = this.profile;
         this.profile = null;
+        old.clearCustomerInternal();
     }
-
 }
