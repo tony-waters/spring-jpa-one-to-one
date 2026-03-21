@@ -22,7 +22,7 @@ class VariantF_UnidirectionalSharedPkExplicitLifecycleTest {
     @PersistenceContext EntityManager entityManager;
 
     @Test
-    void savingProfileAfterPersistingCustomer_usesCustomerIdAsProfileId() {
+    void savingProfileAfterPersistingCustomer_assignsSharedIdentifier() {
         CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
 
         ProfileF profile = new ProfileF(customer, true);
@@ -55,14 +55,14 @@ class VariantF_UnidirectionalSharedPkExplicitLifecycleTest {
         CustomerF customer = customerRepository.saveAndFlush(new CustomerF("Eve"));
         ProfileF profile = profileRepository.saveAndFlush(new ProfileF(customer, true));
 
-        Long profileId = jdbc.queryForObject(
+        Long storedId = jdbc.queryForObject(
                 "select customer_id from profile_f where customer_id = ?",
                 Long.class,
                 customer.getId()
         );
 
-        assertThat(profileId).isEqualTo(customer.getId());
-        assertThat(profileId).isEqualTo(profile.getId());
+        assertThat(storedId).isEqualTo(customer.getId());
+        assertThat(storedId).isEqualTo(profile.getId());
     }
 
     @Test

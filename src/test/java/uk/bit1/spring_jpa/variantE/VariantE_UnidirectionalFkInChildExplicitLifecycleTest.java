@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,6 +18,7 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
     @Autowired CustomerERepository customerRepository;
     @Autowired ProfileERepository profileRepository;
     @PersistenceContext EntityManager entityManager;
+    @Autowired JdbcTemplate jdbc;
 
     @Test
     void savingProfileAfterPersistingCustomer_succeeds() {
@@ -101,7 +103,7 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
                 .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
-    @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
+
 
 //    @Test
 //    void schema_customerIdColumnExistsOnProfileTable() {

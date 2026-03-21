@@ -5,8 +5,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant D: unidirectional one-to-one with foreign key in parent.
+ * CustomerD owns the relationship and fully controls the profile lifecycle.
+ */
 @Entity
-@Table(name = "CUSTOMER_D")
+@Table(name = "customer_d")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerD {
 
@@ -33,7 +37,7 @@ public class CustomerD {
     private String displayName;
 
     public CustomerD(String displayName) {
-        String normalized = displayName == null ? null : displayName.strip();
+        String normalized = (displayName == null ? null : displayName.strip());
         if (normalized == null || normalized.isEmpty()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
@@ -44,18 +48,9 @@ public class CustomerD {
         if (this.profile != null) {
             throw new IllegalStateException("Customer already has a Profile");
         }
-        this.profile = new ProfileD(marketingOptIn);
-        return profile;
-    }
-
-    public void attachProfile(ProfileD profile) {
-        if (profile == null) {
-            throw new IllegalArgumentException("profile must not be null");
-        }
-        if (this.profile != null) {
-            throw new IllegalStateException("Customer already has a Profile");
-        }
+        ProfileD profile = new ProfileD(marketingOptIn);
         this.profile = profile;
+        return profile;
     }
 
     public void removeProfile() {

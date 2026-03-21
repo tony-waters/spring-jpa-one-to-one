@@ -37,7 +37,7 @@ class VariantA_BidirectionalFkInParentTest {
     }
 
     @Test
-    void removingProfile_triggersOrphanRemoval_andDeletesProfileRow() {
+    void removingProfileFromCustomer_orphansAndDeletesProfile() {
         CustomerA customer = new CustomerA("Alice");
         ProfileA profile = customer.createProfile(false);
 

@@ -5,8 +5,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant E: unidirectional one-to-one with foreign key in child.
+ * ProfileE owns the relationship and references CustomerE directly.
+ */
 @Entity
-@Table(name = "PROFILE_E")
+@Table(name = "profile_e")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileE {
 
@@ -15,7 +19,6 @@ public class ProfileE {
     @Getter
     private Long id;
 
-    // Owning side: FK lives in profile_e.customer_id
     @OneToOne(optional = false)
     @JoinColumn(
             name = "customer_id",
@@ -36,7 +39,4 @@ public class ProfileE {
         this.customer = customer;
         this.marketingOptIn = marketingOptIn;
     }
-
-    // no lifecycle management here
-    // relationship is managed from the service layer
 }

@@ -34,7 +34,7 @@ class VariantC_BidirectionalSharedPkMapsIdTest {
     }
 
     @Test
-    void removingProfile_triggersOrphanRemoval_andDeletesSharedPrimaryKeyRow() {
+    void removingProfileFromCustomer_orphansAndDeletesSharedPrimaryKeyRow() {
         CustomerC customer = new CustomerC("Carol");
         customer.createProfile(false);
 

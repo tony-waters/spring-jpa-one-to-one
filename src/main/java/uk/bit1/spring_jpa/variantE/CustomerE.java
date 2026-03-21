@@ -5,8 +5,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant E: unidirectional one-to-one with foreign key in child.
+ * CustomerE has no reference to ProfileE; lifecycle ordering is handled by the caller.
+ */
 @Entity
-@Table(name = "CUSTOMER_E")
+@Table(name = "customer_e")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerE {
 
@@ -20,12 +24,10 @@ public class CustomerE {
     private String displayName;
 
     public CustomerE(String displayName) {
-        if (displayName == null || displayName.isBlank()) {
+        String normalized = (displayName == null ? null : displayName.strip());
+        if (normalized == null || normalized.isEmpty()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
-        this.displayName = displayName.strip();
+        this.displayName = normalized;
     }
-
-    // no lifecycle management here
-    // relationship is managed from the service layer
 }

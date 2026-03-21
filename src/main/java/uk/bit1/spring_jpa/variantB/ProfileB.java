@@ -20,7 +20,7 @@ public class ProfileB {
     private Long id;
 
     @OneToOne(optional = false) // Note, internal unlink used during parent-side removal
-                                // before orphan deletion in clearCustomerInternal() below
+                                // before orphan deletion (see clearCustomerInternal below)
     @JoinColumn(
             name = "customer_id",
             nullable = false,

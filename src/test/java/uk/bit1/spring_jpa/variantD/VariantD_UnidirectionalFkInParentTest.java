@@ -82,22 +82,6 @@ class VariantD_UnidirectionalFkInParentTest {
     }
 
     @Test
-    void databaseUniqueConstraint_preventsReusingSameProfileForTwoCustomers() {
-        CustomerD firstCustomer = new CustomerD("Dan");
-        ProfileD sharedProfile = firstCustomer.createProfile(true);
-        customerRepository.saveAndFlush(firstCustomer);
-
-        CustomerD secondCustomer = new CustomerD("Dave");
-        secondCustomer.attachProfile(sharedProfile);
-
-        assertThatThrownBy(() -> customerRepository.saveAndFlush(secondCustomer))
-                .isInstanceOf(DataIntegrityViolationException.class);
-
-        assertThat(customerRepository.findById(firstCustomer.getId())).isPresent();
-        assertThat(profileRepository.findById(sharedProfile.getId())).isPresent();
-    }
-
-    @Test
     void schema_fkColumnExistsOnCustomerTable_notProfileTable() {
         assertThat(SchemaAssertion.columnExists(jdbc, "customer_d", "profile_id")).isTrue();
         assertThat(SchemaAssertion.columnExists(jdbc, "profile_d", "customer_id")).isFalse();

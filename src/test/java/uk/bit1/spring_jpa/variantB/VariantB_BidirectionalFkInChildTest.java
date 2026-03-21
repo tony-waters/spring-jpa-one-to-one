@@ -3,6 +3,7 @@ package uk.bit1.spring_jpa.variantB;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import uk.bit1.spring_jpa.support.SchemaAssertion;
 
@@ -118,7 +119,7 @@ class VariantB_BidirectionalFkInChildTest {
         second.setCustomerInternal(managedCustomer);
 
         assertThatThrownBy(() -> profileRepository.saveAndFlush(second))
-                .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+                .isInstanceOf(DataIntegrityViolationException.class);
 
         assertThat(profileRepository.findById(first.getId())).isPresent();
     }

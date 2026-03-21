@@ -5,13 +5,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant D: unidirectional one-to-one with foreign key in parent.
+ * ProfileD has no reference back to CustomerD.
+ */
 @Entity
-@Table(name = "PROFILE_D")
+@Table(name = "profile_d")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileD {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
     private Long id;
 
@@ -22,6 +26,4 @@ public class ProfileD {
     ProfileD(boolean marketingOptIn) {
         this.marketingOptIn = marketingOptIn;
     }
-
 }
-
