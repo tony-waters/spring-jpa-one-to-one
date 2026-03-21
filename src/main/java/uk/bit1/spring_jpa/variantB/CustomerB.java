@@ -33,7 +33,7 @@ public class CustomerB {
     private String displayName;
 
     public CustomerB(String displayName) {
-        String normalized = displayName == null ? null : displayName.strip();
+        String normalized = (displayName == null ? null : displayName.strip());
         if (normalized == null || normalized.isEmpty()) {
             throw new IllegalArgumentException("displayName must have a value");
         }
@@ -49,6 +49,7 @@ public class CustomerB {
         return profile;
     }
 
+    // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");

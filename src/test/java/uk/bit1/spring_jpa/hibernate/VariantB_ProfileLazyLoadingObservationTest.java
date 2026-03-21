@@ -20,7 +20,7 @@ class VariantB_ProfileLazyLoadingObservationTest {
 
     @Test
     @Transactional
-    void inverseSideProfileIsObservedAsInitializedInThisHibernateSetup() {
+    void profileIsObservedAsEagerInThisHibernateSetup() {
         CustomerB customer = new CustomerB("Bob");
         customer.createProfile(true);
         customerRepository.saveAndFlush(customer);

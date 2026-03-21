@@ -25,24 +25,4 @@ class VariantA_EntityContractTest {
                 .hasMessage("Customer has no Profile to remove");
     }
 
-    @Test
-    void attachProfile_whenProfileIsNull_throws() {
-        CustomerA customer = new CustomerA("Alice");
-
-        assertThatThrownBy(() -> customer.attachProfile(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("profile must not be null");
-    }
-
-    @Test
-    void attachProfile_whenProfileAlreadyExists_throws() {
-        CustomerA customer = new CustomerA("Alice");
-        customer.createProfile(true);
-
-        ProfileA another = new ProfileA(false);
-
-        assertThatThrownBy(() -> customer.attachProfile(another))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Customer already has a Profile");
-    }
 }

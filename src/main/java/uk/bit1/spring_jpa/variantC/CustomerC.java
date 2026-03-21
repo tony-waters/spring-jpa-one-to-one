@@ -47,7 +47,17 @@ public class CustomerC {
         return profile;
     }
 
-    // Parent side lifecycle control
+    public void attachProfile(ProfileC profile) {
+        if(profile == null) {
+            throw new IllegalArgumentException("profile must not be null");
+        }
+        if (this.profile != null) {
+            throw new IllegalStateException("Customer already has a Profile");
+        }
+        this.profile = profile;
+    }
+
+    // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");

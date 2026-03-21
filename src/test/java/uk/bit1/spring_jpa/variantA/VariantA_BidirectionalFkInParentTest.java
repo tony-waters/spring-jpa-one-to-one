@@ -135,19 +135,4 @@ class VariantA_BidirectionalFkInParentTest {
         assertThat(count).isGreaterThan(0);
     }
 
-    @Test
-    void databaseUniqueConstraint_preventsReusingSameProfileForTwoCustomers() {
-        CustomerA firstCustomer = new CustomerA("Alice");
-        ProfileA sharedProfile = firstCustomer.createProfile(true);
-        customerRepository.saveAndFlush(firstCustomer);
-
-        CustomerA secondCustomer = new CustomerA("Bob");
-        secondCustomer.attachProfile(sharedProfile);
-
-        assertThatThrownBy(() -> customerRepository.saveAndFlush(secondCustomer))
-                .isInstanceOf(DataIntegrityViolationException.class);
-
-        assertThat(customerRepository.findById(firstCustomer.getId())).isPresent();
-        assertThat(profileRepository.findById(sharedProfile.getId())).isPresent();
-    }
 }
