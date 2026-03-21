@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * CustomerB is inverse side; ProfileB owns the relationship.
  */
 @Entity
-@Table(name = "PROFILE_B")
+@Table(name = "profile_b")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileB {
 
@@ -19,7 +19,8 @@ public class ProfileB {
     @Getter
     private Long id;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false) // Note, internal unlink used during parent-side removal
+                                // before orphan deletion in clearCustomerInternal() below
     @JoinColumn(
             name = "customer_id",
             nullable = false,
@@ -47,6 +48,7 @@ public class ProfileB {
     }
 
     void clearCustomerInternal() {
+        // Internal unlink used during parent-side removal before orphan deletion
         this.customer = null;
     }
 }

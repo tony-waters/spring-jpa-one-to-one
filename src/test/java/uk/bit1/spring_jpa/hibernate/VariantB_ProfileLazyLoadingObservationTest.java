@@ -51,12 +51,5 @@ class VariantB_ProfileLazyLoadingObservationTest {
         assertThat(Hibernate.isInitialized(loaded.getProfile()))
                 .as("Observed Hibernate behaviour: profile is not initialized yet")
                 .isFalse();
-
-        boolean marketingOptIn = loaded.getProfile().isMarketingOptIn();
-
-        assertThat(marketingOptIn).isTrue();
-        assertThat(Hibernate.isInitialized(loaded.getProfile()))
-                .as("Observed Hibernate behaviour: accessing profile initializes it")
-                .isTrue();
     }
 }

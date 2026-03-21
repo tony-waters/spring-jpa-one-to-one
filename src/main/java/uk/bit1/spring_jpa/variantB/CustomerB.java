@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * CustomerB is inverse side; ProfileB owns the relationship.
  */
 @Entity
-@Table(name = "CUSTOMER_B")
+@Table(name = "customer_b")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerB {
 
@@ -44,18 +44,18 @@ public class CustomerB {
         if (this.profile != null) {
             throw new IllegalStateException("Customer already has a Profile");
         }
-        this.profile = new ProfileB(marketingOptIn);
-        this.profile.setCustomerInternal(this);
+        ProfileB profile = new ProfileB(marketingOptIn);
+        profile.setCustomerInternal(this);
+        this.profile = profile;
         return profile;
     }
 
-    // Parent side - lifecycle control lives here
     public void removeProfile() {
         if (this.profile == null) {
             throw new IllegalStateException("Customer has no Profile to remove");
         }
         ProfileB old = this.profile;
         this.profile = null;
-        // cascade and orphan removal takes care of Profile
+        old.clearCustomerInternal();
     }
 }
