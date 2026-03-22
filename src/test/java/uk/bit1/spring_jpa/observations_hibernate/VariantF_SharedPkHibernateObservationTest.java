@@ -1,4 +1,4 @@
-package uk.bit1.spring_jpa.hibernate;
+package uk.bit1.spring_jpa.observations_hibernate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

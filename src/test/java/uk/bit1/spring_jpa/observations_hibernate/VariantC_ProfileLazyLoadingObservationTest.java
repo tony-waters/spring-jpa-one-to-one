@@ -1,8 +1,7 @@
-package uk.bit1.spring_jpa.hibernate;
+package uk.bit1.spring_jpa.observations_hibernate;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -15,8 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 class VariantC_ProfileLazyLoadingObservationTest {
 
-    @Autowired
-    CustomerCRepository customerRepository;
+    @Autowired CustomerCRepository customerRepository;
     @Autowired EntityManager entityManager;
 
     @Test
@@ -31,24 +29,7 @@ class VariantC_ProfileLazyLoadingObservationTest {
         CustomerC loaded = customerRepository.findById(customer.getId()).orElseThrow();
 
         assertThat(Hibernate.isInitialized(loaded.getProfile()))
-                .as("Observed Hibernate behaviour: profile is not initialized yet")
+                .as("Observed Hibernate behaviour: shared-PK inverse-side one-to-one is already initialized")
                 .isTrue();
-    }
-
-    @Disabled("Replaced by above which works")
-    @Test
-    @Transactional
-    void profileIsObservedAsLazyInThisHibernateSetup() {
-        CustomerC customer = new CustomerC("Carol");
-        customer.createProfile(true);
-        customerRepository.saveAndFlush(customer);
-
-        entityManager.clear();
-
-        CustomerC loaded = customerRepository.findById(customer.getId()).orElseThrow();
-
-        assertThat(Hibernate.isInitialized(loaded.getProfile()))
-                .as("Observed Hibernate behaviour: profile is not initialized yet")
-                .isFalse();
     }
 }

@@ -1,8 +1,7 @@
-package uk.bit1.spring_jpa.hibernate;
+package uk.bit1.spring_jpa.observations_hibernate;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -34,22 +33,5 @@ class VariantB_ProfileLazyLoadingObservationTest {
                 .isTrue();
 
         assertThat(loaded.getProfile().isMarketingOptIn()).isTrue();
-    }
-
-    @Disabled("Replaced by above which works")
-    @Test
-    @Transactional
-    void profileIsObservedAsLazyInThisHibernateSetup() {
-        CustomerB customer = new CustomerB("Bob");
-        customer.createProfile(true);
-        customerRepository.saveAndFlush(customer);
-
-        entityManager.clear();
-
-        CustomerB loaded = customerRepository.findById(customer.getId()).orElseThrow();
-
-        assertThat(Hibernate.isInitialized(loaded.getProfile()))
-                .as("Observed Hibernate behaviour: profile is not initialized yet")
-                .isFalse();
     }
 }

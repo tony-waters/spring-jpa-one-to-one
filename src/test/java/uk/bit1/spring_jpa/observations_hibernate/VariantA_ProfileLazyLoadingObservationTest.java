@@ -1,33 +1,30 @@
-package uk.bit1.spring_jpa.hibernate;
+package uk.bit1.spring_jpa.observations_hibernate;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
-import uk.bit1.spring_jpa.variantD.CustomerD;
-import uk.bit1.spring_jpa.variantD.CustomerDRepository;
+import uk.bit1.spring_jpa.variantA.CustomerA;
+import uk.bit1.spring_jpa.variantA.CustomerARepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class VariantD_ProfileLazyLoadingObservationTest {
+class VariantA_ProfileLazyLoadingObservationTest {
 
-    @Autowired
-    CustomerDRepository customerRepository;
+    @Autowired CustomerARepository customerRepository;
     @Autowired EntityManager entityManager;
 
     @Test
-    @Transactional
     void profileIsObservedAsLazyInThisHibernateSetup() {
-        CustomerD customer = new CustomerD("Dan");
+        CustomerA customer = new CustomerA("Alice");
         customer.createProfile(true);
         customerRepository.saveAndFlush(customer);
 
         entityManager.clear();
 
-        CustomerD loaded = customerRepository.findById(customer.getId()).orElseThrow();
+        CustomerA loaded = customerRepository.findById(customer.getId()).orElseThrow();
 
         assertThat(Hibernate.isInitialized(loaded.getProfile()))
                 .as("Observed Hibernate behaviour: profile is not initialized yet")
