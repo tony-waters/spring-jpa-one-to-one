@@ -17,6 +17,8 @@ It’s about understanding trade-offs, ownership, lifecycle control, and databas
 - How JPA behaviour differs from database constraints
 - Why “clean domain model” vs “explicit lifecycle” is a real trade-off
 
+------
+
 ## Variants Overview
 
 ### Variant A — Bidirectional, FK in Parent
@@ -35,7 +37,7 @@ It’s about understanding trade-offs, ownership, lifecycle control, and databas
 - FK in parent is less common
 - Inverse side LAZY is often ignored by Hibernate
 
-### Variant B — Bidirectional, FK in Child ⭐ (Recommended Default)
+### Variant B — Bidirectional, FK in Child (Recommended Default)
 
 - ProfileB owns relationship
 - FK stored in profile table
@@ -120,6 +122,8 @@ It’s about understanding trade-offs, ownership, lifecycle control, and databas
 - Caller must manage ordering
 - Less convenient than cascade model
 
+------
+
 ## Testing Strategy
 
 Each variant is covered by two types of tests:
@@ -152,6 +156,8 @@ Example:
 ``` java
 assertThat(profileRepository.findById(profileId)).isNotPresent();
 ```
+
+------
 
 ## Key Insights
 ### 1. Owning Side Matters More Than You Think
@@ -207,6 +213,8 @@ Hibernate often loads it eagerly unless bytecode enhancement is active.
 👉 Treat LAZY one-to-one as best-effort, not guaranteed.
 And prove behaviour through tests.
 
+------
+
 ## Recommendations
 
 ### Default choice
@@ -221,6 +229,8 @@ And prove behaviour through tests.
 ### Maximum control / service-driven
 #### 👉 Variant E or F
 
+------
+
 ## Tech Stack
 
 - Java 21
@@ -230,6 +240,8 @@ And prove behaviour through tests.
 - H2 (test database)
 - AssertJ
 
+------
+
 ## How to Run
 
 ``` terminaloutput
@@ -237,6 +249,8 @@ mvn clean test
 ```
 
 All variants are fully tested with schema + behaviour verification.
+
+------
 
 ## Final Thought
 
