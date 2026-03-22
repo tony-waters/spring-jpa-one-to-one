@@ -157,6 +157,15 @@ Example:
 assertThat(profileRepository.findById(profileId)).isNotPresent();
 ```
 
+In addition, I have included some hibernate observations for this setup.
+These concentrate on Lazy Loading and show:
+
+- Variant A: observed lazy in this setup
+- Variant B: observed eager in this setup
+- Variant C: observed eager in this setup
+- Variant D: observed lazy in this setup
+- Variant F: Hibernate may persist transient parent when saving @MapsId child in this setup
+
 ------
 
 ## Key Insights
