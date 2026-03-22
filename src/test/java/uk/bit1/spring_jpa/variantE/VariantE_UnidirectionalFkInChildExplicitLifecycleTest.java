@@ -17,8 +17,8 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
 
     @Autowired CustomerERepository customerRepository;
     @Autowired ProfileERepository profileRepository;
-    @PersistenceContext EntityManager entityManager;
     @Autowired JdbcTemplate jdbc;
+    @PersistenceContext EntityManager entityManager;
 
     @Test
     void savingProfileAfterPersistingCustomer_succeeds() {
@@ -34,15 +34,16 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
     }
 
     @Test
-    void uniqueConstraint_preventsTwoProfilesForSameCustomer() {
+    void secondProfileForSameCustomer_failsAndLeavesOriginalProfileIntact() {
         CustomerE customer = customerRepository.saveAndFlush(new CustomerE("Alice"));
-
-        profileRepository.saveAndFlush(new ProfileE(customer, true));
+        ProfileE first = profileRepository.saveAndFlush(new ProfileE(customer, true));
 
         ProfileE second = new ProfileE(customer, false);
 
         assertThatThrownBy(() -> profileRepository.saveAndFlush(second))
                 .isInstanceOf(DataIntegrityViolationException.class);
+
+        assertThat(profileRepository.findById(first.getId())).isPresent();
     }
 
     @Test
@@ -52,20 +53,6 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
         assertThat(customer.getId()).isNotNull();
         assertThat(profileRepository.findAll()).isEmpty();
     }
-
-//    @Test
-//    void deletingCustomerBeforeProfile_failsWithConstraintViolation() {
-//        CustomerE customer = customerRepository.saveAndFlush(new CustomerE("Alice"));
-//        ProfileE profile = profileRepository.saveAndFlush(new ProfileE(customer, true));
-//
-//        assertThat(customer.getId()).isNotNull();
-//        assertThat(profile.getId()).isNotNull();
-//
-//        assertThatThrownBy(() -> {
-//            customerRepository.delete(customer);
-//            customerRepository.flush();
-//        }).isInstanceOf(DataIntegrityViolationException.class);
-//    }
 
     @Test
     void deletingManagedCustomerWhileManagedProfileStillReferencesIt_failsAtOrmLevel() {
@@ -103,33 +90,19 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
                 .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
-
-
-//    @Test
-//    void schema_customerIdColumnExistsOnProfileTable() {
-//        Integer count = jdbc.queryForObject("""
-//        select count(*)
-//        from information_schema.columns
-//        where upper(table_name) = 'PROFILE_E'
-//          and upper(column_name) = 'CUSTOMER_ID'
-//        """, Integer.class);
-//
-//        assertThat(count).isEqualTo(1);
-//    }
-
     @Test
     void schema_foreignKeyExistsFromProfileToCustomer() {
         Integer count = jdbc.queryForObject("""
-        select count(*)
-        from information_schema.table_constraints tc
-        join information_schema.key_column_usage kcu
-          on tc.constraint_name = kcu.constraint_name
-         and tc.table_schema = kcu.table_schema
-         and tc.table_name = kcu.table_name
-        where tc.constraint_type = 'FOREIGN KEY'
-          and upper(tc.table_name) = 'PROFILE_E'
-          and upper(kcu.column_name) = 'CUSTOMER_ID'
-        """, Integer.class);
+            select count(*)
+            from information_schema.table_constraints tc
+            join information_schema.key_column_usage kcu
+              on tc.constraint_name = kcu.constraint_name
+             and tc.table_schema = kcu.table_schema
+             and tc.table_name = kcu.table_name
+            where tc.constraint_type = 'FOREIGN KEY'
+              and upper(tc.table_name) = 'PROFILE_E'
+              and upper(kcu.column_name) = 'CUSTOMER_ID'
+            """, Integer.class);
 
         assertThat(count).isGreaterThan(0);
     }
@@ -137,18 +110,18 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
     @Test
     void schema_fkColumnExistsOnProfileTable_notCustomerTable() {
         Integer profileCount = jdbc.queryForObject("""
-        select count(*)
-        from information_schema.columns
-        where upper(table_name) = 'PROFILE_E'
-          and upper(column_name) = 'CUSTOMER_ID'
-        """, Integer.class);
+            select count(*)
+            from information_schema.columns
+            where upper(table_name) = 'PROFILE_E'
+              and upper(column_name) = 'CUSTOMER_ID'
+            """, Integer.class);
 
         Integer customerCount = jdbc.queryForObject("""
-        select count(*)
-        from information_schema.columns
-        where upper(table_name) = 'CUSTOMER_E'
-          and upper(column_name) = 'PROFILE_ID'
-        """, Integer.class);
+            select count(*)
+            from information_schema.columns
+            where upper(table_name) = 'CUSTOMER_E'
+              and upper(column_name) = 'PROFILE_ID'
+            """, Integer.class);
 
         assertThat(profileCount).isEqualTo(1);
         assertThat(customerCount).isEqualTo(0);
@@ -167,5 +140,4 @@ class VariantE_UnidirectionalFkInChildExplicitLifecycleTest {
 
         assertThat(fkValue).isEqualTo(customer.getId());
     }
-
 }
