@@ -6,6 +6,8 @@ with working examples, tests, and schema assertions.
 This repo is not about CRUD. 
 It’s about understanding trade-offs, ownership, lifecycle control, and database shape.
 
+See article: https://tony-waters.github.io/2026/02/25/6-ways-to-map-a-jpa-one-to-one-relationship.html
+
 ------
 
 ## What it Shows
