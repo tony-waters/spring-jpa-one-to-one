@@ -18,7 +18,6 @@ class VariantC_ProfileLazyLoadingObservationTest {
     @Autowired EntityManager entityManager;
 
     @Test
-    @Transactional
     void profileIsObservedAsEagerInThisHibernateSetup() {
         CustomerC customer = new CustomerC("Carol");
         customer.createProfile(true);

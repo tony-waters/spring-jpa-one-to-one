@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
  * CustomerF has no reference to ProfileF; lifecycle ordering is handled by the caller.
  */
 @Entity
-@Table(name = "PROFILE_F")
+@Table(name = "profile_f")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileF {
 
     @Id
     @Getter
-    private Long id; // no @GeneratedValue — derived from customer.id via @MapsId
+    private Long id;
 
     @OneToOne(
-            optional = false // child must always reference a parent
+            optional = false
     )
     @MapsId
     @JoinColumn(
