@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Variant F: unidirectional one-to-one with shared primary key via @MapsId.
+ * CustomerF has no reference to ProfileF; lifecycle ordering is handled by the caller.
+ */
 @Entity
 @Table(name = "PROFILE_F")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
