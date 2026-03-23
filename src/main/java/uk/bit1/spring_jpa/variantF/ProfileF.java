@@ -33,7 +33,6 @@ public class ProfileF {
     @Column(nullable = false)
     private boolean marketingOptIn = false;
 
-    // made public for testing hibernate behaviour
     public ProfileF(CustomerF customer, boolean marketingOptIn) {
         if (customer == null) {
             throw new IllegalArgumentException("customer must not be null");
