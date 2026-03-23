@@ -1,4 +1,4 @@
-# Spring JPA One-to-One Relationships
+# 6 Spring JPA One-to-One Relationships
 
 A focused exploration of six different ways to model one-to-one relationships in JPA, 
 with working examples, tests, and schema assertions.
